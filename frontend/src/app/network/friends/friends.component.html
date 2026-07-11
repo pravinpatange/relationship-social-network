@@ -1,0 +1,85 @@
+<div class="space-y-8">
+  
+  <!-- Add New Friend -->
+  <div class="glass-card p-6 border-l-4 border-primary-500">
+    <h3 class="text-lg font-bold text-white mb-4">Connect with someone</h3>
+    <form (ngSubmit)="sendRequest()" class="flex space-x-4">
+      <input 
+        type="number" 
+        [(ngModel)]="newFriendId" 
+        name="newFriendId"
+        placeholder="Enter User ID to connect" 
+        class="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+      >
+      <button 
+        type="submit"
+        [disabled]="!newFriendId"
+        class="bg-primary-600 hover:bg-primary-500 text-white font-medium px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-primary-600/30 disabled:opacity-50">
+        Send Request
+      </button>
+    </form>
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
+  </div>
+
+  <!-- Pending Requests -->
+  <div *ngIf="!isLoading && pendingRequests.length > 0">
+    <h3 class="text-lg font-bold text-white mb-4 flex items-center space-x-2">
+      <span class="w-2 h-2 rounded-full bg-secondary-500 animate-pulse"></span>
+      <span>Pending Requests ({{ pendingRequests.length }})</span>
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div *ngFor="let req of pendingRequests" class="glass-card p-5 flex items-center justify-between hover:border-secondary-500/30 transition-colors">
+        <div class="flex items-center space-x-3">
+          <div class="h-10 w-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white">
+            U{{ req.requesterId }}
+          </div>
+          <div>
+            <div class="text-white font-medium">User ID: {{ req.requesterId }}</div>
+            <div class="text-xs text-slate-400">Wants to connect</div>
+          </div>
+        </div>
+        <div class="flex space-x-2">
+          <button (click)="acceptRequest(req.id)" class="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white p-2 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          </button>
+          <button (click)="rejectRequest(req.id)" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white p-2 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Connections -->
+  <div *ngIf="!isLoading">
+    <h3 class="text-lg font-bold text-white mb-4">My Connections ({{ acceptedFriends.length }})</h3>
+    
+    <div *ngIf="acceptedFriends.length === 0" class="glass-card p-10 text-center border-dashed border-2 border-slate-700/50">
+      <div class="text-4xl mb-4">🤝</div>
+      <h3 class="text-lg font-medium text-white mb-2">No connections yet</h3>
+      <p class="text-slate-400 text-sm">Start building your network by sending requests.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div *ngFor="let friend of acceptedFriends" class="tilt-card glass-card p-5 flex items-center justify-between group">
+        <div class="flex items-center space-x-3">
+          <div class="h-12 w-12 rounded-full bg-gradient-to-tr from-primary-600 to-secondary-500 flex items-center justify-center font-bold text-white text-lg shadow-lg">
+             {{ (friend.friendDetails?.displayName?.charAt(0) || 'U') }}
+          </div>
+          <div>
+            <div class="text-white font-medium text-lg">{{ friend.friendDetails?.displayName || 'User ' + friend.receiverId }}</div>
+            <div class="text-xs text-slate-400">Connected since {{ friend.createdAt | date:'mediumDate' }}</div>
+          </div>
+        </div>
+        
+        <button class="text-slate-500 hover:text-primary-400 p-2 rounded-lg bg-slate-800/50 opacity-0 group-hover:opacity-100 transition-all">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

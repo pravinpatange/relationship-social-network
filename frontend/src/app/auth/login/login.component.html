@@ -1,0 +1,55 @@
+<div class="min-h-screen flex items-center justify-center p-4 relative z-10">
+  <div class="tilt-card glass-card w-full max-w-md p-8 relative overflow-hidden">
+    <!-- Glow effect behind the form -->
+    <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary-500/30 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-secondary-500/30 rounded-full blur-3xl"></div>
+
+    <div class="relative z-10">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold tracking-tight text-gradient">Welcome Back</h1>
+        <p class="text-slate-400 mt-2 text-sm">Sign in to your relationship network</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-300 mb-1">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email"
+            class="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-slate-500"
+            placeholder="name@example.com"
+          >
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-slate-300 mb-1">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password"
+            class="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-slate-500"
+            placeholder="••••••••"
+          >
+        </div>
+
+        <div *ngIf="errorMessage" class="text-red-400 text-sm bg-red-900/20 border border-red-900/50 rounded-lg p-3">
+          {{ errorMessage }}
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="loginForm.invalid || isLoading"
+          class="w-full bg-primary-600 hover:bg-primary-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-primary-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+        >
+          {{ isLoading ? 'Signing in...' : 'Sign In' }}
+        </button>
+      </form>
+
+      <div class="mt-6 text-center text-sm text-slate-400">
+        Don't have an account? 
+        <a routerLink="/register" class="text-primary-400 hover:text-primary-300 font-medium transition-colors">Create one now</a>
+      </div>
+    </div>
+  </div>
+</div>

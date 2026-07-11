@@ -24,8 +24,8 @@ class AuthServiceTest {
         when(pw.encode(any())).thenReturn("hashed");
         UserEntity saved = UserEntity.builder().id(1L).username("pravin").email("pravin@test.com").passwordHash("hashed").build();
         when(userRepo.save(any())).thenReturn(saved);
-        when(jwt.fromUsername(any())).thenReturn("access-token");
-        when(jwt.refreshFromUsername(any())).thenReturn("refresh-token");
+        when(jwt.generateTokenFromUsername(any())).thenReturn("access-token");
+        when(jwt.generateRefreshTokenFromUsername(any())).thenReturn("refresh-token");
         var res = authService.register(new AuthDto.RegisterRequest("pravin","pravin@test.com","pass1234",null,null));
         assertThat(res.getAccessToken()).isEqualTo("access-token");
         assertThat(res.getRefreshToken()).isEqualTo("refresh-token");
