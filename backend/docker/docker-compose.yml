@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: social-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: relationship_social_network
+      POSTGRES_USER: social_user
+      POSTGRES_PASSWORD: social_password
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

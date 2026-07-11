@@ -1,0 +1,33 @@
+spring:
+
+  jackson:
+  time-zone: Asia/Kolkata
+  application:
+    name: social-network
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/relationship_social_network
+    username: social_user
+    password: social_password
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+logging:
+    level:
+      com.zaxxer.hikari: DEBUG
+      org.springframework.jdbc: DEBUG
+
+app:
+  jwt:
+    secret: VGhpc0lzQVN1cGVyU2VjcmV0S2V5Rm9ySldUVG9rZW5HZW5lcmF0aW9uMTIzNDU2Nzg5MA==
+    expiration-ms: 900000
+    refresh-expiration-ms: 604800000
