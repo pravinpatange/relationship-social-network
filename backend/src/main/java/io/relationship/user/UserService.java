@@ -2,7 +2,7 @@ package io.relationship.user;
 
 
 import io.relationship.common.exception.ResourceNotFoundException;
-import io.relationship.common.responce.PagedResponse;
+import io.relationship.common.response.PagedResponse;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

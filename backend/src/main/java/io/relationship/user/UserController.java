@@ -1,8 +1,8 @@
 package io.relationship.user;
 
 
-import io.relationship.common.responce.ApiResponse;
-import io.relationship.common.responce.PagedResponse;
+import io.relationship.common.response.ApiResponse;
+import io.relationship.common.response.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

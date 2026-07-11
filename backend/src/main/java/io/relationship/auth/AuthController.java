@@ -1,6 +1,6 @@
 package io.relationship.auth;
 
-import io.relationship.common.responce.ApiResponse;
+import io.relationship.common.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
