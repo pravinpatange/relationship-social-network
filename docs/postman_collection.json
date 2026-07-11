@@ -1,0 +1,94 @@
+{
+  "info": {
+    "name": "Relationship-Aware Social Network API",
+    "description": "Complete API collection. Run Register → Login (token auto-saved) → use any other request.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key":"baseUrl","value":"http://localhost:8080"},
+    {"key":"token","value":""}
+  ],
+  "item": [
+    {"name":"Auth","item":[
+      {"name":"Register","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/auth/register","host":["{{baseUrl}}"],"path":["api","auth","register"]},"body":{"mode":"raw","raw":"{\n  \"username\": \"pravin\",\n  \"email\": \"pravin@example.com\",\n  \"password\": \"password123\",\n  \"displayName\": \"Pravin Patange\",\n  \"mobileNumber\": \"+91-9999999999\"\n}"}}},
+      {"name":"Login","event":[{"listen":"test","script":{"exec":["var j=pm.response.json();","if(j.data&&j.data.accessToken){pm.collectionVariables.set('token',j.data.accessToken);}"]}}],"request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/auth/login","host":["{{baseUrl}}"],"path":["api","auth","login"]},"body":{"mode":"raw","raw":"{\n  \"email\": \"pravin@example.com\",\n  \"password\": \"password123\"\n}"}}},
+      {"name":"Refresh Token","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/auth/refresh","host":["{{baseUrl}}"],"path":["api","auth","refresh"]},"body":{"mode":"raw","raw":"{\n  \"refreshToken\": \"YOUR_REFRESH_TOKEN\"\n}"}}},
+      {"name":"Logout","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/auth/logout","host":["{{baseUrl}}"],"path":["api","auth","logout"]}}}
+    ]},
+    {"name":"Users","item":[
+      {"name":"Get My Profile","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/users/me","host":["{{baseUrl}}"],"path":["api","users","me"]}}},
+      {"name":"Update Profile","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/users/me","host":["{{baseUrl}}"],"path":["api","users","me"]},"body":{"mode":"raw","raw":"{\n  \"displayName\": \"Pravin Patange\",\n  \"bio\": \"Senior Java Developer @ Manhattan Associates\",\n  \"location\": \"Bengaluru, India\",\n  \"accountType\": \"PUBLIC\"\n}"}}},
+      {"name":"Get User By ID","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/users/1","host":["{{baseUrl}}"],"path":["api","users","1"]}}},
+      {"name":"Search Users","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/users/search?q=pravin&page=0&size=10","host":["{{baseUrl}}"],"path":["api","users","search"],"query":[{"key":"q","value":"pravin"},{"key":"page","value":"0"},{"key":"size","value":"10"}]}}}
+    ]},
+    {"name":"Groups","item":[
+      {"name":"Create Group - Family","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/groups","host":["{{baseUrl}}"],"path":["api","groups"]},"body":{"mode":"raw","raw":"{\n  \"groupName\": \"Family\",\n  \"description\": \"My family members\"\n}"}}},
+      {"name":"Create Group - Best Friend","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/groups","host":["{{baseUrl}}"],"path":["api","groups"]},"body":{"mode":"raw","raw":"{\n  \"groupName\": \"Best Friend\",\n  \"description\": \"My closest friends\"\n}"}}},
+      {"name":"Create Group - Corporate","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/groups","host":["{{baseUrl}}"],"path":["api","groups"]},"body":{"mode":"raw","raw":"{\n  \"groupName\": \"Corporate\",\n  \"description\": \"Work colleagues\"\n}"}}},
+      {"name":"Get My Groups","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/groups","host":["{{baseUrl}}"],"path":["api","groups"]}}},
+      {"name":"Get Group By ID","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/groups/1","host":["{{baseUrl}}"],"path":["api","groups","1"]}}},
+      {"name":"Update Group","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/groups/1","host":["{{baseUrl}}"],"path":["api","groups","1"]},"body":{"mode":"raw","raw":"{\n  \"groupName\": \"Family Circle\",\n  \"description\": \"Updated description\"\n}"}}},
+      {"name":"Delete Group","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/groups/1","host":["{{baseUrl}}"],"path":["api","groups","1"]}}}
+    ]},
+    {"name":"Friends","item":[
+      {"name":"Send Friend Request","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/friends/request","host":["{{baseUrl}}"],"path":["api","friends","request"]},"body":{"mode":"raw","raw":"{\n  \"receiverId\": 2\n}"}}},
+      {"name":"Accept Friend Request","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/friends/1/accept","host":["{{baseUrl}}"],"path":["api","friends","1","accept"]}}},
+      {"name":"Reject Friend Request","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/friends/1/reject","host":["{{baseUrl}}"],"path":["api","friends","1","reject"]}}},
+      {"name":"Get My Friends","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/friends","host":["{{baseUrl}}"],"path":["api","friends"]}}},
+      {"name":"Get Pending Requests","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/friends/requests","host":["{{baseUrl}}"],"path":["api","friends","requests"]}}},
+      {"name":"Assign Friend to Groups","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/friends/2/groups","host":["{{baseUrl}}"],"path":["api","friends","2","groups"]},"body":{"mode":"raw","raw":"{\n  \"groupIds\": [1, 2]\n}"}}},
+      {"name":"Get Friend Groups","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/friends/2/groups","host":["{{baseUrl}}"],"path":["api","friends","2","groups"]}}},
+      {"name":"Unfriend","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/friends/2","host":["{{baseUrl}}"],"path":["api","friends","2"]}}},
+      {"name":"Block User","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/friends/2/block","host":["{{baseUrl}}"],"path":["api","friends","2","block"]}}},
+      {"name":"Unblock User","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/friends/2/block","host":["{{baseUrl}}"],"path":["api","friends","2","block"]}}}
+    ]},
+    {"name":"Followers","item":[
+      {"name":"Follow User","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/follow/2","host":["{{baseUrl}}"],"path":["api","follow","2"]}}},
+      {"name":"Unfollow User","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/follow/2","host":["{{baseUrl}}"],"path":["api","follow","2"]}}},
+      {"name":"Get My Followers","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/follow/followers","host":["{{baseUrl}}"],"path":["api","follow","followers"]}}},
+      {"name":"Get Following","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/follow/following","host":["{{baseUrl}}"],"path":["api","follow","following"]}}}
+    ]},
+    {"name":"Posts","item":[
+      {"name":"Create Post - PUBLIC","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/posts","host":["{{baseUrl}}"],"path":["api","posts"]},"body":{"mode":"raw","raw":"{\n  \"caption\": \"Hello world! Public post.\",\n  \"visibilityType\": \"PUBLIC\"\n}"}}},
+      {"name":"Create Post - PRIVATE","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/posts","host":["{{baseUrl}}"],"path":["api","posts"]},"body":{"mode":"raw","raw":"{\n  \"caption\": \"Only I can see this.\",\n  \"visibilityType\": \"PRIVATE\"\n}"}}},
+      {"name":"Create Post - ALL_CONNECTIONS","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/posts","host":["{{baseUrl}}"],"path":["api","posts"]},"body":{"mode":"raw","raw":"{\n  \"caption\": \"All my friends can see this.\",\n  \"visibilityType\": \"ALL_CONNECTIONS\"\n}"}}},
+      {"name":"Create Post - SELECTED_GROUPS","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/posts","host":["{{baseUrl}}"],"path":["api","posts"]},"body":{"mode":"raw","raw":"{\n  \"caption\": \"Family trip photo!\",\n  \"visibilityType\": \"SELECTED_GROUPS\",\n  \"visibleToGroupIds\": [1]\n}"}}},
+      {"name":"Get Post By ID","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/posts/1","host":["{{baseUrl}}"],"path":["api","posts","1"]}}},
+      {"name":"Get My Posts","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/posts/me","host":["{{baseUrl}}"],"path":["api","posts","me"]}}},
+      {"name":"Delete Post","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/posts/1","host":["{{baseUrl}}"],"path":["api","posts","1"]}}}
+    ]},
+    {"name":"Feed","item":[
+      {"name":"Feed - All Mode","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/feed?page=0&size=20","host":["{{baseUrl}}"],"path":["api","feed"],"query":[{"key":"page","value":"0"},{"key":"size","value":"20"}]}}},
+      {"name":"Feed - Family Mode","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/feed?groupId=1&page=0&size=20","host":["{{baseUrl}}"],"path":["api","feed"],"query":[{"key":"groupId","value":"1"},{"key":"page","value":"0"},{"key":"size","value":"20"}]}}},
+      {"name":"Feed - Corporate Mode","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/feed?groupId=2&page=0&size=20","host":["{{baseUrl}}"],"path":["api","feed"],"query":[{"key":"groupId","value":"2"},{"key":"page","value":"0"},{"key":"size","value":"20"}]}}}
+    ]},
+    {"name":"Comments","item":[
+      {"name":"Add Comment","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/posts/1/comments","host":["{{baseUrl}}"],"path":["api","posts","1","comments"]},"body":{"mode":"raw","raw":"{\n  \"commentText\": \"Great post!\"\n}"}}},
+      {"name":"Get Comments","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/posts/1/comments","host":["{{baseUrl}}"],"path":["api","posts","1","comments"]}}},
+      {"name":"Delete Comment","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/posts/1/comments/1","host":["{{baseUrl}}"],"path":["api","posts","1","comments","1"]}}}
+    ]},
+    {"name":"Likes","item":[
+      {"name":"Like Post","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/posts/1/likes","host":["{{baseUrl}}"],"path":["api","posts","1","likes"]}}},
+      {"name":"Unlike Post","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/posts/1/likes","host":["{{baseUrl}}"],"path":["api","posts","1","likes"]}}},
+      {"name":"Like Status","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/posts/1/likes","host":["{{baseUrl}}"],"path":["api","posts","1","likes"]}}}
+    ]},
+    {"name":"Mode","item":[
+      {"name":"Switch to Family Mode","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/mode/change","host":["{{baseUrl}}"],"path":["api","mode","change"]},"body":{"mode":"raw","raw":"{\n  \"groupId\": 1\n}"}}},
+      {"name":"Switch to ALL Mode","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/mode/change","host":["{{baseUrl}}"],"path":["api","mode","change"]},"body":{"mode":"raw","raw":"{\n  \"groupId\": null\n}"}}},
+      {"name":"Get Current Mode","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/mode/current","host":["{{baseUrl}}"],"path":["api","mode","current"]}}}
+    ]},
+    {"name":"Chat","item":[
+      {"name":"Start Chat Room","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/chats/rooms","host":["{{baseUrl}}"],"path":["api","chats","rooms"]},"body":{"mode":"raw","raw":"{\n  \"otherUserId\": 2,\n  \"contextGroupId\": null\n}"}}},
+      {"name":"Start Group-Context Chat","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/chats/rooms","host":["{{baseUrl}}"],"path":["api","chats","rooms"]},"body":{"mode":"raw","raw":"{\n  \"otherUserId\": 2,\n  \"contextGroupId\": 1\n}"}}},
+      {"name":"Get My Rooms","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/chats/rooms","host":["{{baseUrl}}"],"path":["api","chats","rooms"]}}},
+      {"name":"Send Message","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/chats/rooms/1/messages","host":["{{baseUrl}}"],"path":["api","chats","rooms","1","messages"]},"body":{"mode":"raw","raw":"{\n  \"message\": \"Hey! How are you?\"\n}"}}},
+      {"name":"Get Messages","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/chats/rooms/1/messages","host":["{{baseUrl}}"],"path":["api","chats","rooms","1","messages"]}}}
+    ]},
+    {"name":"Notifications","item":[
+      {"name":"Get Notifications","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/notifications","host":["{{baseUrl}}"],"path":["api","notifications"]}}},
+      {"name":"Unread Count","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/notifications/unread-count","host":["{{baseUrl}}"],"path":["api","notifications","unread-count"]}}},
+      {"name":"Mark All Read","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/notifications/mark-all-read","host":["{{baseUrl}}"],"path":["api","notifications","mark-all-read"]}}},
+      {"name":"Mark One Read","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/notifications/1/read","host":["{{baseUrl}}"],"path":["api","notifications","1","read"]}}}
+    ]}
+  ]
+}

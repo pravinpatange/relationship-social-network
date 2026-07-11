@@ -1,10 +1,5 @@
 package io.relationship.common.exception;
-
 public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String message) {
-        super(message);
-    }
-    public ResourceNotFoundException(String resource, Long id) {
-        super(resource + " not found with id: " + id);
-    }
+    public ResourceNotFoundException(String msg) { super(msg); }
+    public ResourceNotFoundException(String r, Long id) { super(r + " not found with id: " + id); }
 }
