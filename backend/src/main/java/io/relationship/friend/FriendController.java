@@ -31,7 +31,10 @@ public class FriendController {
         friendService.unblockUser(id(ud),userId); return ResponseEntity.ok(ApiResponse.success("Unblocked",null));
     }
     @GetMapping public ResponseEntity<ApiResponse<List<FriendDto.FriendshipResponse>>> friends(@AuthenticationPrincipal UserDetails ud) {
-        return ResponseEntity.ok(ApiResponse.success(friendService.getAcceptedFriends(id(ud)).stream().map(friendService::toResponse).toList()));
+        Long id = id(ud);
+        List<FriendshipEntity> accepted = friendService.getAcceptedFriends(id);
+        System.out.println("DEBUG API /friends for user " + id + " returned " + accepted.size() + " rows");
+        return ResponseEntity.ok(ApiResponse.success(accepted.stream().map(friendService::toResponse).toList()));
     }
     @GetMapping("/requests") public ResponseEntity<ApiResponse<List<FriendDto.FriendshipResponse>>> pending(@AuthenticationPrincipal UserDetails ud) {
         return ResponseEntity.ok(ApiResponse.success(friendService.getPendingRequests(id(ud)).stream().map(friendService::toResponse).toList()));
