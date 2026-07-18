@@ -31,7 +31,10 @@
         <div class="friend-card-top">
           <div class="avatar" style="width:52px;height:52px;font-size:18px">{{initials(friendName(f))}}</div>
           <div>
-            <div class="friend-name" [routerLink]="['/profile', friendId(f)]">{{friendName(f)}}</div>
+            <div class="friend-name" [routerLink]="['/profile', friendId(f)]">
+              {{friendName(f)}}
+              <span style="font-size:10px;color:red;"> [DBG: {{f.requesterUsername}} / {{f.receiverUsername}} | myId: {{myId()}}]</span>
+            </div>
             <div class="friend-meta">
               <span class="material-icons-round" style="font-size:13px;color:var(--teal)">check_circle</span> Connected
             </div>

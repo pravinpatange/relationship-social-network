@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, OnInit, signal, computed } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { RouterLink, Router } from "@angular/router";
@@ -139,6 +139,7 @@ export class FriendsComponent implements OnInit {
   }
 
   friendName(f: Friendship) {
+    console.log("Friend object:", f, "myId:", this.myId());
     return f.requesterId === this.myId() ? f.receiverUsername : f.requesterUsername;
   }
 
