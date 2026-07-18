@@ -10,7 +10,7 @@ public class ChatMessageEntity {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id;
     @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="room_id",nullable=false) private ChatRoomEntity room;
     @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="sender_id",nullable=false) private UserEntity sender;
-    @Lob @Column(nullable=false) private String message;
+    @Column(nullable=false, columnDefinition="TEXT") private String message;
     @CreationTimestamp @Column(name="created_at",nullable=false,updatable=false) private LocalDateTime createdAt;
     @UpdateTimestamp @Column(name="updated_at",nullable=false) private LocalDateTime updatedAt;
 }

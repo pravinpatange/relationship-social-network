@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class PostEntity {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id;
     @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="user_id",nullable=false) private UserEntity author;
-    @Lob private String caption;
+    @Column(columnDefinition = "TEXT") private String caption;
     @Column(name="media_url") private String mediaUrl;
     @Column(name="visibility_type",nullable=false,length=30) @Enumerated(EnumType.STRING) @Builder.Default
     private VisibilityType visibilityType = VisibilityType.ALL_CONNECTIONS;

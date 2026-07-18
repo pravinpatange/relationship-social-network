@@ -35,7 +35,7 @@ public class UserEntity {
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String bio;
 
     @Column(length = 100)
