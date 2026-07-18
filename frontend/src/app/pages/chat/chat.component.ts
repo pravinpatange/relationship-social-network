@@ -30,6 +30,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
   initialRoomId: number | null = null;
   private shouldScroll = false;
   private wsSub: any;
+  myId = computed(() => this.auth.currentUser()?.id);
 
   constructor(private api: ApiService, public auth: AuthService, private router: Router, private ws: WebSocketService) {
     const nav = this.router.getCurrentNavigation();
@@ -125,16 +126,14 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   otherUser(room: ChatRoom) {
-    const me = this.auth.currentUser();
-    return me?.id === room.user1Id ? room.user2Username : room.user1Username;
+    return this.myId() === room.user1Id ? room.user2Username : room.user1Username;
   }
 
   friendName(f: Friendship) {
-    const me = this.auth.currentUser();
-    return f.requesterId === me?.id ? f.receiverUsername : f.requesterUsername;
+    return f.requesterId === this.myId() ? f.receiverUsername : f.requesterUsername;
   }
 
-  isMe(msg: ChatMessage) { return msg.senderId === this.auth.currentUser()?.id; }
+  isMe(msg: ChatMessage) { return msg.senderId === this.myId(); }
 
   initials(name: string) { return (name||"?").split(" ").map((w:string)=>w[0]).join("").toUpperCase().slice(0,2); }
 

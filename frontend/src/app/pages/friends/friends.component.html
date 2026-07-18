@@ -26,7 +26,7 @@
 
   <!-- FRIENDS TAB -->
   <div *ngIf="tab()==='friends'">
-    <div class="friends-grid" *ngIf="!loading()">
+    <div class="friends-grid" *ngIf="!loading() && currentUserId()">
       <div class="friend-card glass-card fade-in-up" *ngFor="let f of friends(); let i = index" [style.animation-delay]="(i*0.05)+'s'">
         <div class="friend-card-top">
           <div class="avatar" style="width:52px;height:52px;font-size:18px">{{initials(friendName(f))}}</div>

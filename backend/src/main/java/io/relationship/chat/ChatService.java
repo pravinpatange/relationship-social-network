@@ -30,8 +30,8 @@ public class ChatService {
         
         ChatMessageEntity savedMsg = msgRepo.save(ChatMessageEntity.builder().room(room).sender(userService.getById(uid)).message(text).build());
         
-        Long receiverId = room.getUser1().getId().equals(uid) ? room.getUser2().getId() : room.getUser1().getId();
-        messagingTemplate.convertAndSendToUser(receiverId.toString(), "/queue/messages", toMsgResponse(savedMsg));
+        UserEntity receiver = room.getUser1().getId().equals(uid) ? room.getUser2() : room.getUser1();
+        messagingTemplate.convertAndSendToUser(receiver.getEmail(), "/queue/messages", toMsgResponse(savedMsg));
         
         return savedMsg;
     }

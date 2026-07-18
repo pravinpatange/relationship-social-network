@@ -30,6 +30,7 @@ export class FriendsComponent implements OnInit {
   assignTarget = signal<Friendship | null>(null);
   assignedGroups = signal<number[]>([]);
   savingGroups = signal(false);
+  myId = computed(() => this.auth.currentUser()?.id);
 
   constructor(private api: ApiService, private router: Router, private auth: AuthService) {}
 
@@ -123,22 +124,22 @@ export class FriendsComponent implements OnInit {
   }
 
   currentUserId() {
-    return this.auth.currentUser()?.id;
+    return this.myId();
   }
 
   messageFriend(f: Friendship) {
-    const friendId = f.requesterId === this.currentUserId() ? f.receiverId : f.requesterId;
+    const friendId = f.requesterId === this.myId() ? f.receiverId : f.requesterId;
     this.api.startChat(friendId).subscribe(room => {
       this.router.navigate(['/chat'], { state: { roomId: room.id } });
     });
   }
 
   friendId(f: Friendship) {
-    return f.requesterId === this.currentUserId() ? f.receiverId : f.requesterId;
+    return f.requesterId === this.myId() ? f.receiverId : f.requesterId;
   }
 
   friendName(f: Friendship) {
-    return f.requesterId === this.currentUserId() ? f.receiverUsername : f.requesterUsername;
+    return f.requesterId === this.myId() ? f.receiverUsername : f.requesterUsername;
   }
 
   initials(name: string) { return name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2); }
