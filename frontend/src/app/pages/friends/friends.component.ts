@@ -143,5 +143,5 @@ export class FriendsComponent implements OnInit {
     return f.requesterId === this.myId() ? f.receiverUsername : f.requesterUsername;
   }
 
-  initials(name: string) { return name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2); }
+  initials(name: string | undefined) { return (name || "?").split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2); }
 }
