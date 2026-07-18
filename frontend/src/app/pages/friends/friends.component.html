@@ -24,9 +24,11 @@
     </button>
   </div>
 
-  <!-- FRIENDS TAB -->
   <div *ngIf="tab()==='friends'">
-    <div class="friends-grid" *ngIf="!loading() && currentUserId()">
+    <div style="padding:10px;background:red;color:white;font-weight:bold;margin-bottom:10px;">
+      DEBUG STATE: myId() = {{myId() | json}} | loading = {{loading() | json}} | friends.length = {{friends().length}}
+    </div>
+    <div class="friends-grid" *ngIf="!loading() && myId()">
       <div class="friend-card glass-card fade-in-up" *ngFor="let f of friends(); let i = index" [style.animation-delay]="(i*0.05)+'s'">
         <div class="friend-card-top">
           <div class="avatar" style="width:52px;height:52px;font-size:18px">{{initials(friendName(f))}}</div>
