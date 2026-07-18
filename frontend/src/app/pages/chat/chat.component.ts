@@ -1,8 +1,9 @@
-import { Component, OnInit, signal, ViewChild, ElementRef, AfterViewChecked } from "@angular/core";
+import { Component, OnInit, signal, ViewChild, ElementRef, AfterViewChecked, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { ApiService } from "../../core/services/api.service";
 import { AuthService } from "../../core/services/auth.service";
+import { WebSocketService } from "../../core/services/websocket.service";
 import { Router } from "@angular/router";
 import { ChatRoom, ChatMessage, Friendship } from "../../core/models";
 
@@ -13,7 +14,7 @@ import { ChatRoom, ChatMessage, Friendship } from "../../core/models";
   templateUrl: "./chat.component.html",
   styleUrl: "./chat.component.css"
 })
-export class ChatComponent implements OnInit, AfterViewChecked {
+export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild("msgEnd") msgEnd!: ElementRef;
 
   rooms = signal<ChatRoom[]>([]);
@@ -28,8 +29,9 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   loadingFriends = signal(false);
   initialRoomId: number | null = null;
   private shouldScroll = false;
+  private wsSub: any;
 
-  constructor(private api: ApiService, public auth: AuthService, private router: Router) {
+  constructor(private api: ApiService, public auth: AuthService, private router: Router, private ws: WebSocketService) {
     const nav = this.router.getCurrentNavigation();
     if (nav?.extras.state?.['roomId']) {
       this.initialRoomId = nav.extras.state['roomId'];
@@ -48,6 +50,30 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       }, 
       error: () => this.loading.set(false) 
     });
+
+    this.ws.connect();
+    this.wsSub = this.ws.messageSubject.subscribe(msg => {
+      // If message belongs to active room, append it
+      if (this.activeRoom()?.id === msg.roomId) {
+        this.messages.update(ms => [...ms, msg]);
+        this.shouldScroll = true;
+      }
+      
+      // Update room list order if needed (bump to top)
+      const existingRooms = this.rooms();
+      const roomIdx = existingRooms.findIndex(r => r.id === msg.roomId);
+      if (roomIdx >= 0) {
+        const room = existingRooms[roomIdx];
+        const newRooms = [...existingRooms];
+        newRooms.splice(roomIdx, 1);
+        this.rooms.set([room, ...newRooms]);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.wsSub) this.wsSub.unsubscribe();
+    this.ws.disconnect();
   }
 
   ngAfterViewChecked() {
