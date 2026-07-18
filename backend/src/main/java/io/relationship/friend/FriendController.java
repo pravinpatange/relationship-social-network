@@ -36,6 +36,9 @@ public class FriendController {
     @GetMapping("/requests") public ResponseEntity<ApiResponse<List<FriendDto.FriendshipResponse>>> pending(@AuthenticationPrincipal UserDetails ud) {
         return ResponseEntity.ok(ApiResponse.success(friendService.getPendingRequests(id(ud)).stream().map(friendService::toResponse).toList()));
     }
+    @GetMapping("/requests/sent") public ResponseEntity<ApiResponse<List<FriendDto.FriendshipResponse>>> sent(@AuthenticationPrincipal UserDetails ud) {
+        return ResponseEntity.ok(ApiResponse.success(friendService.getSentRequests(id(ud)).stream().map(friendService::toResponse).toList()));
+    }
     @PostMapping("/{fId}/groups") public ResponseEntity<ApiResponse<Void>> assignGroups(@AuthenticationPrincipal UserDetails ud, @PathVariable Long fId, @Valid @RequestBody FriendDto.AssignGroupsRequest req) {
         friendService.assignFriendToGroups(id(ud),fId,req.getGroupIds()); return ResponseEntity.ok(ApiResponse.success("Groups assigned",null));
     }

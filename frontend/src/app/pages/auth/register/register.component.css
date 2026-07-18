@@ -1,0 +1,12 @@
+@import "../login/login.component.css";
+.step-indicator { display: flex; align-items: center; gap: 0; margin-bottom: 28px; }
+.step-dot {
+  width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--glass-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--white-60); transition: all 0.3s;
+}
+.step-dot.active { border-color: var(--violet); color: var(--violet-light); background: var(--violet-glow); }
+.step-dot.done { background: var(--violet); border-color: var(--violet); color: white; }
+.step-line { flex: 1; height: 2px; background: var(--glass-border); margin: 0 8px; transition: all 0.3s; }
+.step-line.active { background: var(--violet); }
+.step-nav { display: flex; gap: 12px; align-items: center; }

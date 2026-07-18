@@ -1,88 +1,58 @@
-import { Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Injectable, signal, computed } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
+import { Observable, tap } from "rxjs";
+import { ApiResponse, AuthResponse, User } from "../models";
 
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  displayName: string;
-  profilePictureUrl?: string;
-  bio?: string;
-  location?: string;
-  website?: string;
-  accountType?: string;
-}
-
-export interface AuthResponse {
-  accessToken: string;
-  refreshToken?: string;
-  userId?: number;
-  username?: string;
-  email?: string;
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: "root" })
 export class AuthService {
-  private apiUrl = '/api/auth';
-  private readonly TOKEN_KEY = 'rsn_token';
-  
-  public currentUser = signal<User | null>(null);
+  private readonly API = "http://localhost:8080/api";
+  private _token = signal<string|null>(localStorage.getItem("token"));
+  private _currentUser = signal<User|null>(null);
 
-  constructor(private http: HttpClient) {
-    this.checkToken();
+  readonly isLoggedIn = computed(() => !!this._token());
+  readonly currentUser = this._currentUser.asReadonly();
+  readonly token = this._token.asReadonly();
+
+  constructor(private http: HttpClient, private router: Router) {
+    if (this._token()) this.loadCurrentUser();
   }
 
-  register(data: any): Observable<ApiResponse<AuthResponse>> {
-    return this.http.post<ApiResponse<AuthResponse>>(`${this.apiUrl}/register`, data);
+  register(data: {username:string;email:string;password:string;displayName?:string}): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.API}/auth/register`, data)
+      .pipe(tap(r => this.saveSession(r.data)));
   }
 
-  login(data: any): Observable<ApiResponse<AuthResponse>> {
-    return this.http.post<ApiResponse<AuthResponse>>(`${this.apiUrl}/login`, data).pipe(
-      tap(response => {
-        if (response.success && response.data?.accessToken) {
-          this.setToken(response.data.accessToken);
-          // Set a partial user since login response returns basic info
-          this.currentUser.set({
-            id: response.data.userId || 0,
-            username: response.data.username || '',
-            email: response.data.email || '',
-            displayName: response.data.username || ''
-          });
-        }
-      })
-    );
+  login(data: {email:string;password:string}): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.API}/auth/login`, data)
+      .pipe(tap(r => this.saveSession(r.data)));
   }
 
-  logout() {
-    this.removeToken();
-    this.currentUser.set(null);
+  refreshToken(refreshToken: string): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.API}/auth/refresh`, { refreshToken })
+      .pipe(tap(r => {
+        localStorage.setItem("token", r.data.accessToken);
+        localStorage.setItem("refreshToken", r.data.refreshToken);
+        this._token.set(r.data.accessToken);
+      }));
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+  logout(): void {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    this._token.set(null);
+    this._currentUser.set(null);
+    this.router.navigate(["/login"]);
   }
 
-  private setToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+  loadCurrentUser(): void {
+    this.http.get<ApiResponse<User>>(`${this.API}/users/me`).subscribe(r => this._currentUser.set(r.data));
   }
 
-  private removeToken(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-  }
-
-  private checkToken() {
-    // Basic check for token existence on startup
-    if (this.getToken()) {
-      // Typically we'd fetch the user profile here, but for now we just want to avoid clearing it entirely
-    }
+  private saveSession(auth: AuthResponse): void {
+    localStorage.setItem("token", auth.accessToken);
+    localStorage.setItem("refreshToken", auth.refreshToken);
+    this._token.set(auth.accessToken);
+    this.loadCurrentUser();
   }
 }

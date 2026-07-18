@@ -1,0 +1,95 @@
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="auth-brand">
+      <span class="material-icons-round" style="font-size:40px;color:var(--violet-light)">hub</span>
+      <h1 class="gradient-text">Nexus</h1>
+      <p>Your social world,<br>organized by relationship.</p>
+    </div>
+    <div class="auth-rings">
+      <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-card glass-card fade-in-up">
+      <div class="step-indicator">
+        <div class="step-dot" [class.active]="step() >= 1" [class.done]="step() > 1">
+          <span *ngIf="step() <= 1">1</span>
+          <span class="material-icons-round" *ngIf="step() > 1" style="font-size:14px">check</span>
+        </div>
+        <div class="step-line" [class.active]="step() > 1"></div>
+        <div class="step-dot" [class.active]="step() >= 2">2</div>
+      </div>
+
+      <h2>{{step() === 1 ? 'Create your account' : 'Secure your account'}}</h2>
+      <p class="auth-sub">{{step() === 1 ? 'Tell us about yourself' : 'Set up your login credentials'}}</p>
+
+      <div class="auth-error" *ngIf="error()">
+        <span class="material-icons-round">error_outline</span> {{error()}}
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <!-- Step 1 -->
+        <div *ngIf="step() === 1" class="fade-in-up">
+          <div class="field-group">
+            <label>Display Name</label>
+            <div class="input-wrap">
+              <span class="material-icons-round">badge</span>
+              <input class="input-field" type="text" formControlName="displayName" placeholder="Pravin Patange" />
+            </div>
+            <span class="field-err" *ngIf="form.get('displayName')?.invalid && form.get('displayName')?.touched">Min 2 characters</span>
+          </div>
+          <div class="field-group">
+            <label>Username</label>
+            <div class="input-wrap">
+              <span class="material-icons-round">alternate_email</span>
+              <input class="input-field" type="text" formControlName="username" placeholder="pravin_patange" />
+            </div>
+            <span class="field-err" *ngIf="form.get('username')?.invalid && form.get('username')?.touched">Letters, numbers, underscores only (3–50 chars)</span>
+          </div>
+          <button type="button" class="btn-primary auth-btn" (click)="nextStep()">
+            Continue <span class="material-icons-round">arrow_forward</span>
+          </button>
+        </div>
+
+        <!-- Step 2 -->
+        <div *ngIf="step() === 2" class="fade-in-up">
+          <div class="field-group">
+            <label>Email address</label>
+            <div class="input-wrap">
+              <span class="material-icons-round">email</span>
+              <input class="input-field" type="email" formControlName="email" placeholder="pravin@example.com" />
+            </div>
+            <span class="field-err" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">Valid email required</span>
+          </div>
+          <div class="field-group">
+            <label>Password</label>
+            <div class="input-wrap">
+              <span class="material-icons-round">lock</span>
+              <input class="input-field" [type]="showPass() ? 'text' : 'password'" formControlName="password" placeholder="Min 8 characters" />
+              <span class="material-icons-round eye-toggle" (click)="showPass.set(!showPass())">
+                {{showPass() ? 'visibility_off' : 'visibility'}}
+              </span>
+            </div>
+            <span class="field-err" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">Min 8 characters</span>
+          </div>
+          <div class="step-nav">
+            <button type="button" class="btn-ghost" (click)="step.set(1)">
+              <span class="material-icons-round">arrow_back</span> Back
+            </button>
+            <button type="submit" class="btn-primary auth-btn" [disabled]="loading()" style="flex:1">
+              <span class="spinner" *ngIf="loading()"></span>
+              <span class="material-icons-round" *ngIf="!loading()">rocket_launch</span>
+              {{loading() ? 'Creating...' : 'Create Account'}}
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="auth-divider"><span>Already on Nexus?</span></div>
+      <a routerLink="/login" class="btn-ghost" style="width:100%;justify-content:center">
+        <span class="material-icons-round">login</span> Sign In
+      </a>
+    </div>
+  </div>
+</div>

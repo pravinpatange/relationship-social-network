@@ -1,0 +1,113 @@
+<div class="chat-layout">
+  <!-- Rooms sidebar -->
+  <div class="rooms-panel glass-card">
+    <div class="rooms-header" style="display:flex;justify-content:space-between;align-items:center;">
+      <h3>{{ showNewChat() ? 'New Chat' : 'Messages' }}</h3>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="rooms-count" *ngIf="!showNewChat()">{{rooms().length}}</span>
+        <button class="btn-icon" (click)="toggleNewChat()" [title]="showNewChat() ? 'Cancel' : 'New Chat'" style="width:32px;height:32px;background:var(--white-5);border-radius:50%">
+          <span class="material-icons-round" style="font-size:18px">{{ showNewChat() ? 'close' : 'add_comment' }}</span>
+        </button>
+      </div>
+    </div>
+    <div class="rooms-list">
+      <!-- Friends List View (New Chat) -->
+      <ng-container *ngIf="showNewChat()">
+        <div *ngIf="loadingFriends()" style="display:flex;justify-content:center;padding:24px">
+          <div class="spinner"></div>
+        </div>
+        <div class="room-item" *ngFor="let f of friendsList()" (click)="startChatWithFriend(f)">
+          <div class="avatar" style="width:44px;height:44px;font-size:15px;flex-shrink:0">{{initials(friendName(f))}}</div>
+          <div class="room-info">
+            <div class="room-name">{{friendName(f)}}</div>
+            <div class="room-time" style="color:var(--white-60)">Start conversation</div>
+          </div>
+        </div>
+        <div class="rooms-empty" *ngIf="!loadingFriends() && friendsList().length === 0">
+          <span class="material-icons-round" style="font-size:40px;color:var(--white-60)">people_outline</span>
+          <p>No friends yet.</p>
+        </div>
+      </ng-container>
+
+      <!-- Rooms List View -->
+      <ng-container *ngIf="!showNewChat()">
+        <div *ngIf="loading()" style="padding:16px">
+          <div *ngFor="let i of [1,2,3]" style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+            <div class="shimmer" style="width:44px;height:44px;border-radius:50%"></div>
+            <div style="flex:1"><div class="shimmer" style="height:13px;width:100px;border-radius:5px;margin-bottom:6px"></div><div class="shimmer" style="height:11px;width:140px;border-radius:5px"></div></div>
+          </div>
+        </div>
+        <div class="room-item" *ngFor="let r of rooms()" [class.active]="activeRoom()?.id === r.id" (click)="selectRoom(r)">
+          <div class="avatar" style="width:44px;height:44px;font-size:15px;flex-shrink:0">{{initials(otherUser(r))}}</div>
+          <div class="room-info">
+            <div class="room-name">{{otherUser(r)}}</div>
+            <div class="room-ctx" *ngIf="r.contextGroupName">
+              <span class="material-icons-round" style="font-size:11px">group</span> {{r.contextGroupName}}
+            </div>
+            <div class="room-time">{{timeAgo(r.createdAt)}}</div>
+          </div>
+        </div>
+        <div class="rooms-empty" *ngIf="!loading() && rooms().length === 0">
+          <span class="material-icons-round" style="font-size:40px;color:var(--white-60)">chat_bubble_outline</span>
+          <p>No conversations yet.<br>Go to Friends and start chatting!</p>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Chat window -->
+  <div class="chat-window">
+    <!-- No room selected -->
+    <div class="chat-empty" *ngIf="!activeRoom()">
+      <div class="chat-empty-icon">
+        <span class="material-icons-round">forum</span>
+      </div>
+      <h3>Select a conversation</h3>
+      <p>Choose a conversation from the left to start messaging</p>
+    </div>
+
+    <!-- Active room -->
+    <div class="chat-active" *ngIf="activeRoom()">
+      <!-- Chat header -->
+      <div class="chat-header glass-card">
+        <div class="avatar" style="width:40px;height:40px;font-size:14px">{{initials(otherUser(activeRoom()!))}}</div>
+        <div class="chat-header-info">
+          <div class="chat-header-name">{{otherUser(activeRoom()!)}}</div>
+          <div class="chat-header-ctx" *ngIf="activeRoom()?.contextGroupName">
+            <span class="material-icons-round" style="font-size:12px">group</span> {{activeRoom()?.contextGroupName}}
+          </div>
+        </div>
+        <div class="online-dot status-dot online"></div>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-area">
+        <div *ngIf="loadingMsgs()" style="display:flex;justify-content:center;padding:40px">
+          <div class="spinner"></div>
+        </div>
+        <div *ngIf="!loadingMsgs() && messages().length === 0" style="text-align:center;color:var(--white-60);padding:40px;font-size:14px">
+          <span class="material-icons-round" style="font-size:32px;display:block;margin-bottom:8px">waving_hand</span>
+          Start the conversation!
+        </div>
+        <div *ngFor="let msg of messages()" class="msg-wrapper" [class.mine]="isMe(msg)">
+          <div class="avatar" *ngIf="!isMe(msg)" style="width:28px;height:28px;font-size:10px;flex-shrink:0;align-self:flex-end">{{initials(msg.senderUsername)}}</div>
+          <div class="msg-bubble" [class.mine]="isMe(msg)">
+            <p>{{msg.message}}</p>
+            <span class="msg-time">{{formatTime(msg.createdAt)}}</span>
+          </div>
+        </div>
+        <div #msgEnd></div>
+      </div>
+
+      <!-- Input -->
+      <div class="chat-input-bar glass-card">
+        <input class="chat-input input-field" [(ngModel)]="newMsg"
+               placeholder="Type a message..." (keydown.enter)="send()" />
+        <button class="btn-primary send-btn" (click)="send()" [disabled]="sending() || !newMsg().trim()">
+          <span class="spinner" *ngIf="sending()"></span>
+          <span class="material-icons-round" *ngIf="!sending()">send</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

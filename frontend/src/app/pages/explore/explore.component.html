@@ -1,0 +1,74 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Explore</h1>
+      <p class="page-sub">Discover people and public content</p>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="explore-search glass-card">
+    <span class="material-icons-round" style="color:var(--violet-light);font-size:22px">search</span>
+    <input class="explore-input" [(ngModel)]="searchQuery" placeholder="Search people by name or username..." (keydown.enter)="search()" />
+    <button class="btn-primary" (click)="search()" [disabled]="searching() || searchQuery().length < 2" style="padding:8px 20px">
+      <span class="spinner" *ngIf="searching()"></span>
+      <span *ngIf="!searching()">Search</span>
+    </button>
+  </div>
+
+  <!-- User Results -->
+  <div *ngIf="userResults().length > 0">
+    <h3 class="section-heading">
+      <span class="material-icons-round">people</span> People ({{userResults().length}})
+    </h3>
+    <div class="people-grid">
+      <div class="people-card glass-card fade-in-up" *ngFor="let u of userResults(); let i = index" [style.animation-delay]="(i*0.05)+'s'">
+        <div class="people-card-top">
+          <div class="avatar" style="width:56px;height:56px;font-size:20px">{{initials(u.displayName)}}</div>
+          <div class="people-info">
+            <div class="people-name" [routerLink]="['/profile', u.id]">{{u.displayName}}</div>
+            <div class="people-handle">@{{u.username}}</div>
+            <div class="people-type" *ngIf="u.accountType === 'PUBLIC'">
+              <span class="material-icons-round" style="font-size:12px;color:var(--teal)">public</span> Public Profile
+            </div>
+          </div>
+        </div>
+        <p class="people-bio" *ngIf="u.bio">{{u.bio}}</p>
+        <div class="people-actions">
+          <button class="btn-ghost" style="flex:1;justify-content:center;font-size:13px" [routerLink]="['/profile', u.id]">
+            <span class="material-icons-round" style="font-size:16px">person</span> View Profile
+          </button>
+          <button class="btn-primary" style="flex:1;justify-content:center;font-size:13px" (click)="sendRequest(u.id)" [disabled]="u._sent">
+            <span class="material-icons-round" style="font-size:16px">{{ u._sent ? 'how_to_reg' : 'person_add' }}</span> {{ u._sent ? 'Sent' : 'Connect' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Public Feed -->
+  <div>
+    <h3 class="section-heading">
+      <span class="material-icons-round">public</span> Public Posts
+    </h3>
+
+    <div *ngIf="loadingPosts()">
+      <div class="glass-card" style="padding:20px;margin-bottom:16px" *ngFor="let i of [1,2,3]">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+          <div class="shimmer" style="width:42px;height:42px;border-radius:50%"></div>
+          <div style="flex:1"><div class="shimmer" style="height:14px;width:140px;border-radius:6px;margin-bottom:8px"></div><div class="shimmer" style="height:11px;width:90px;border-radius:6px"></div></div>
+        </div>
+        <div class="shimmer" style="height:80px;border-radius:10px"></div>
+      </div>
+    </div>
+
+    <div *ngIf="!loadingPosts()">
+      <div class="empty-state glass-card" *ngIf="publicPosts().length === 0">
+        <span class="material-icons-round" style="font-size:48px;color:var(--white-60)">explore</span>
+        <h3>Nothing to explore yet</h3>
+        <p>Be the first to share a public post!</p>
+      </div>
+      <app-post-card *ngFor="let p of publicPosts()" [post]="p" />
+    </div>
+  </div>
+</div>

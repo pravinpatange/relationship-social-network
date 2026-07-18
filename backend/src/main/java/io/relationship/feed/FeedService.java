@@ -3,6 +3,7 @@ import io.relationship.common.response.PagedResponse;
 import io.relationship.friend.*;
 import io.relationship.friend.FriendshipEntity.FriendshipStatus;
 import io.relationship.post.*;
+import io.relationship.post.PostEntity.VisibilityType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +24,15 @@ public class FeedService {
         List<PostEntity> merged = new ArrayList<>();
 
         if (groupId==null) {
-            addUnique(merged,seen,postRepo.findAllPublicPosts());
-            if (!friendIds.isEmpty()) addUnique(merged,seen,postRepo.findConnectionsPosts(friendIds));
+            addUnique(merged,seen,postRepo.findAllPublicPosts(VisibilityType.PUBLIC));
+            if (!friendIds.isEmpty()) addUnique(merged,seen,postRepo.findConnectionsPosts(friendIds, List.of(VisibilityType.ALL_CONNECTIONS, VisibilityType.PUBLIC)));
             List<Long> myGroups = mappingRepo.findGroupsWhereUserIsMember(userId);
-            if (!myGroups.isEmpty()) addUnique(merged,seen,postRepo.findPostsVisibleToGroups(myGroups));
+            if (!myGroups.isEmpty()) addUnique(merged,seen,postRepo.findPostsVisibleToGroups(myGroups, VisibilityType.SELECTED_GROUPS));
         } else {
-            addUnique(merged,seen,postRepo.findAllPublicPosts());
+            addUnique(merged,seen,postRepo.findAllPublicPosts(VisibilityType.PUBLIC));
             List<Long> friendsInGroup = mappingRepo.findAllByOwnerIdAndGroupId(userId,groupId).stream().map(m->m.getFriend().getId()).toList();
-            if (!friendsInGroup.isEmpty()) addUnique(merged,seen,postRepo.findConnectionsPosts(friendsInGroup));
-            addUnique(merged,seen,postRepo.findPostsVisibleToGroups(List.of(groupId)));
+            if (!friendsInGroup.isEmpty()) addUnique(merged,seen,postRepo.findConnectionsPosts(friendsInGroup, List.of(VisibilityType.ALL_CONNECTIONS, VisibilityType.PUBLIC)));
+            addUnique(merged,seen,postRepo.findPostsVisibleToGroups(List.of(groupId), VisibilityType.SELECTED_GROUPS));
         }
 
         merged.sort(Comparator.comparing(PostEntity::getCreatedAt).reversed());

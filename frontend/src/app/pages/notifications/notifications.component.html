@@ -1,0 +1,39 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Notifications</h1>
+      <p class="page-sub">Stay up to date with your connections</p>
+    </div>
+    <button class="btn-ghost" *ngIf="unread() > 0" (click)="markAll()">
+      <span class="material-icons-round">done_all</span> Mark all read
+    </button>
+  </div>
+
+  <div *ngIf="loading()">
+    <div class="notif-skeleton glass-card" *ngFor="let i of [1,2,3,4]">
+      <div class="shimmer" style="width:44px;height:44px;border-radius:14px"></div>
+      <div style="flex:1"><div class="shimmer" style="height:14px;width:200px;border-radius:6px;margin-bottom:8px"></div><div class="shimmer" style="height:11px;width:100px;border-radius:6px"></div></div>
+    </div>
+  </div>
+
+  <div class="empty-state glass-card" *ngIf="!loading() && notifications().length === 0">
+    <span class="material-icons-round" style="font-size:48px;color:var(--white-60)">notifications_none</span>
+    <h3>All caught up!</h3>
+    <p>No new notifications.</p>
+  </div>
+
+  <div class="notif-list" *ngIf="!loading()">
+    <div class="notif-item glass-card fade-in-up" *ngFor="let n of notifications(); let i = index"
+         [class.unread]="!n.read" [style.animation-delay]="(i*0.04)+'s'"
+         (click)="!n.read && markOne(n.id)">
+      <div class="notif-icon" [class]="'color-' + iconColor(n.type)">
+        <span class="material-icons-round">{{icon(n.type)}}</span>
+      </div>
+      <div class="notif-content">
+        <p class="notif-msg">{{message(n)}}</p>
+        <span class="notif-time">{{timeAgo(n.createdAt)}}</span>
+      </div>
+      <div class="unread-dot" *ngIf="!n.read"></div>
+    </div>
+  </div>
+</div>

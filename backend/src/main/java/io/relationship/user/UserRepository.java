@@ -32,4 +32,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Page<UserEntity> searchUsers(@Param("query") String query,
                                  @Param("excludeId") Long excludeId,
                                  Pageable pageable);
+
+    @Query("SELECT u FROM UserEntity u WHERE u.id <> :excludeId AND u.isActive = true ORDER BY u.createdAt DESC")
+    Page<UserEntity> findSuggestions(@Param("excludeId") Long excludeId, Pageable pageable);
 }

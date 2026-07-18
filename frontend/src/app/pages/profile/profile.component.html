@@ -1,0 +1,172 @@
+<div class="profile-page">
+  <!-- Loading -->
+  <div *ngIf="loading()" class="profile-loading">
+    <div class="shimmer" style="height:180px;border-radius:16px;margin-bottom:20px"></div>
+    <div class="shimmer" style="height:48px;width:48px;border-radius:50%;margin-bottom:12px"></div>
+    <div class="shimmer" style="height:22px;width:200px;border-radius:8px;margin:0 auto 8px"></div>
+    <div class="shimmer" style="height:14px;width:140px;border-radius:6px;margin:0 auto"></div>
+  </div>
+
+  <div *ngIf="!loading() && user()">
+    <!-- Cover + Avatar -->
+    <div class="profile-cover">
+      <div class="cover-gradient"></div>
+      <div class="cover-overlay"></div>
+    </div>
+
+    <div class="profile-body">
+      <!-- Avatar + Actions -->
+      <div class="profile-top-row">
+        <div class="profile-avatar gradient-border">
+          <div class="avatar" style="width:96px;height:96px;font-size:34px;border:4px solid var(--navy-800)">
+            <img *ngIf="user()?.profilePictureUrl" [src]="user()!.profilePictureUrl" style="width:100%;height:100%;border-radius:50%;object-fit:cover" />
+            <span *ngIf="!user()?.profilePictureUrl">{{initials(user()?.displayName)}}</span>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-primary" *ngIf="isOwnProfile()" (click)="openEdit()">
+            <span class="material-icons-round">edit</span> Edit Profile
+          </button>
+          <button class="btn-ghost" *ngIf="isOwnProfile()" (click)="auth.logout()" style="color:var(--coral-light)">
+            <span class="material-icons-round">logout</span> Logout
+          </button>
+          <button class="btn-ghost" *ngIf="!isOwnProfile()">
+            <span class="material-icons-round">person_add</span> Connect
+          </button>
+          <button class="btn-ghost" *ngIf="!isOwnProfile()">
+            <span class="material-icons-round">chat_bubble_outline</span> Message
+          </button>
+        </div>
+      </div>
+
+      <!-- Profile Info -->
+      <div class="profile-info">
+        <h1 class="profile-name">{{user()?.displayName}}</h1>
+        <p class="profile-handle">@{{user()?.username}}</p>
+
+        <p class="profile-bio" *ngIf="user()?.bio">{{user()?.bio}}</p>
+
+        <div class="profile-meta-row">
+          <span class="profile-meta-item" *ngIf="user()?.location">
+            <span class="material-icons-round">location_on</span> {{user()?.location}}
+          </span>
+          <span class="profile-meta-item" *ngIf="user()?.website">
+            <span class="material-icons-round">link</span>
+            <a [href]="user()?.website" target="_blank">{{user()?.website}}</a>
+          </span>
+          <span class="profile-meta-item">
+            <span class="material-icons-round">calendar_today</span> Joined {{memberSince(user()?.createdAt)}}
+          </span>
+          <span class="profile-meta-item">
+            <span class="material-icons-round">{{user()?.accountType === 'PUBLIC' ? 'public' : 'lock'}}</span>
+            {{user()?.accountType === 'PUBLIC' ? 'Public Profile' : 'Private Profile'}}
+          </span>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="profile-tabs">
+        <button class="profile-tab" [class.active]="tab()==='posts'" (click)="tab.set('posts')">
+          <span class="material-icons-round">grid_on</span> Posts
+          <span class="tab-count">{{posts().length}}</span>
+        </button>
+        <button class="profile-tab" [class.active]="tab()==='about'" (click)="tab.set('about')">
+          <span class="material-icons-round">person_outline</span> About
+        </button>
+      </div>
+
+      <!-- Posts Tab -->
+      <div *ngIf="tab()==='posts'">
+        <div *ngIf="loadingPosts()">
+          <div class="post-skeleton glass-card" *ngFor="let i of [1,2]">
+            <div class="shimmer" style="height:100px;border-radius:10px;margin-bottom:12px"></div>
+            <div class="shimmer" style="height:12px;width:120px;border-radius:6px"></div>
+          </div>
+        </div>
+
+        <div *ngIf="!loadingPosts() && !isOwnProfile()" class="private-posts glass-card">
+          <span class="material-icons-round" style="font-size:40px;color:var(--white-60)">lock</span>
+          <p>Posts are only visible to the profile owner and their connections.</p>
+        </div>
+
+        <div *ngIf="!loadingPosts() && isOwnProfile()">
+          <div class="empty-posts glass-card" *ngIf="posts().length === 0">
+            <span class="material-icons-round" style="font-size:40px;color:var(--white-60)">photo_camera</span>
+            <p>No posts yet. Share something!</p>
+          </div>
+          <app-post-card *ngFor="let p of posts()" [post]="p" (deleted)="onPostDeleted($event)" />
+        </div>
+      </div>
+
+      <!-- About Tab -->
+      <div *ngIf="tab()==='about'" class="about-section glass-card">
+        <div class="about-row">
+          <span class="material-icons-round">badge</span>
+          <div><div class="about-label">Display Name</div><div class="about-value">{{user()?.displayName || '—'}}</div></div>
+        </div>
+        <div class="about-row">
+          <span class="material-icons-round">alternate_email</span>
+          <div><div class="about-label">Username</div><div class="about-value">@{{user()?.username}}</div></div>
+        </div>
+        <div class="about-row">
+          <span class="material-icons-round">info_outline</span>
+          <div><div class="about-label">Bio</div><div class="about-value">{{user()?.bio || 'No bio set'}}</div></div>
+        </div>
+        <div class="about-row">
+          <span class="material-icons-round">location_on</span>
+          <div><div class="about-label">Location</div><div class="about-value">{{user()?.location || '—'}}</div></div>
+        </div>
+        <div class="about-row">
+          <span class="material-icons-round">link</span>
+          <div><div class="about-label">Website</div><div class="about-value">{{user()?.website || '—'}}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-backdrop" *ngIf="editing()" (click)="editing.set(false)"></div>
+<div class="modal glass-card fade-in-up" *ngIf="editing()">
+  <div class="modal-header">
+    <h3><span class="material-icons-round" style="color:var(--violet-light)">edit</span> Edit Profile</h3>
+    <button class="btn-icon" (click)="editing.set(false)"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
+    <div class="field-group">
+      <label>Display Name</label>
+      <input class="input-field" [(ngModel)]="editForm().displayName" (ngModelChange)="editForm.update(f=>({...f,displayName:$event}))" placeholder="Your name" />
+    </div>
+    <div class="field-group">
+      <label>Bio</label>
+      <textarea class="input-field" [(ngModel)]="editForm().bio" (ngModelChange)="editForm.update(f=>({...f,bio:$event}))" placeholder="Tell people about yourself" rows="3" style="resize:none"></textarea>
+    </div>
+    <div class="field-group">
+      <label>Location</label>
+      <input class="input-field" [(ngModel)]="editForm().location" (ngModelChange)="editForm.update(f=>({...f,location:$event}))" placeholder="City, Country" />
+    </div>
+    <div class="field-group">
+      <label>Website</label>
+      <input class="input-field" [(ngModel)]="editForm().website" (ngModelChange)="editForm.update(f=>({...f,website:$event}))" placeholder="https://yoursite.com" />
+    </div>
+    <div class="field-group">
+      <label>Profile Visibility</label>
+      <div class="vis-toggle-row">
+        <button class="vis-toggle-btn" [class.active]="editForm().accountType==='PRIVATE'" (click)="editForm.update(f=>({...f,accountType:'PRIVATE'}))">
+          <span class="material-icons-round">lock</span> Private
+        </button>
+        <button class="vis-toggle-btn" [class.active]="editForm().accountType==='PUBLIC'" (click)="editForm.update(f=>({...f,accountType:'PUBLIC'}))">
+          <span class="material-icons-round">public</span> Public
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-ghost" (click)="editing.set(false)">Cancel</button>
+    <button class="btn-primary" (click)="saveProfile()" [disabled]="saving()">
+      <span class="spinner" *ngIf="saving()"></span>
+      <span class="material-icons-round" *ngIf="!saving()">save</span>
+      {{saving() ? "Saving..." : "Save Changes"}}
+    </button>
+  </div>
+</div>

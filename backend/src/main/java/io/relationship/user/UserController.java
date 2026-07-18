@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -55,5 +56,11 @@ public class UserController {
         Long requesterId = userService.getByEmail(ud.getUsername()).getId();
         PagedResponse<UserDto.UserResponse> result = userService.searchUsers(query, requesterId, page, size);
         return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping("/suggestions")
+    public ResponseEntity<ApiResponse<List<UserDto.UserResponse>>> getSuggestions(@AuthenticationPrincipal UserDetails ud) {
+        Long requesterId = userService.getByEmail(ud.getUsername()).getId();
+        return ResponseEntity.ok(ApiResponse.success(userService.getSuggestions(requesterId)));
     }
 }

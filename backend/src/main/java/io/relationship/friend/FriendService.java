@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 @Service @RequiredArgsConstructor
 public class FriendService {
     private final FriendRepository friendRepo;
@@ -21,8 +22,30 @@ public class FriendService {
     public FriendshipEntity sendRequest(Long reqId, Long recId) {
         if (reqId.equals(recId)) throw new IllegalArgumentException("Cannot send friend request to yourself");
         userService.getById(recId);
-        friendRepo.findByRequesterIdAndReceiverId(reqId,recId).ifPresent(f->{throw new DuplicateResourceException("Friend request already sent");});
-        friendRepo.findByRequesterIdAndReceiverId(recId,reqId).ifPresent(f->{throw new DuplicateResourceException("This user already sent you a request");});
+        
+        Optional<FriendshipEntity> existing = friendRepo.findBetweenUsers(reqId, recId);
+        if (existing.isPresent()) {
+            FriendshipEntity f = existing.get();
+            if (f.getStatus() == FriendshipStatus.PENDING) {
+                if (f.getRequester().getId().equals(reqId)) throw new DuplicateResourceException("Friend request already sent");
+                else throw new DuplicateResourceException("This user already sent you a request");
+            }
+            if (f.getStatus() == FriendshipStatus.ACCEPTED) {
+                throw new DuplicateResourceException("You are already friends");
+            }
+            if (f.getStatus() == FriendshipStatus.BLOCKED) {
+                throw new ForbiddenException("Action not allowed");
+            }
+            // If REJECTED, we reset to PENDING and update requester/receiver
+            if (f.getStatus() == FriendshipStatus.REJECTED) {
+                f.setRequester(userService.getById(reqId));
+                f.setReceiver(userService.getById(recId));
+                f.setStatus(FriendshipStatus.PENDING);
+                notifService.createNotification(recId, reqId, NotificationType.FRIEND_REQUEST, f.getId());
+                return friendRepo.save(f);
+            }
+        }
+
         FriendshipEntity f = friendRepo.save(FriendshipEntity.builder().requester(userService.getById(reqId)).receiver(userService.getById(recId)).status(FriendshipStatus.PENDING).build());
         notifService.createNotification(recId,reqId,NotificationType.FRIEND_REQUEST,f.getId());
         return f;
@@ -69,12 +92,19 @@ public class FriendService {
     }
     @Transactional(readOnly=true) public List<FriendshipEntity> getAcceptedFriends(Long uid) { return friendRepo.findAllByUserIdAndStatus(uid,FriendshipStatus.ACCEPTED); }
     @Transactional(readOnly=true) public List<FriendshipEntity> getPendingRequests(Long uid) { return friendRepo.findPendingRequestsForUser(uid); }
+    @Transactional(readOnly=true) public List<FriendshipEntity> getSentRequests(Long uid) { return friendRepo.findSentRequestsForUser(uid); }
     @Transactional
     public void assignFriendToGroups(Long ownerId, Long friendId, List<Long> groupIds) {
         if (!friendRepo.areFriends(ownerId,friendId)) throw new ForbiddenException("You can only assign groups to accepted friends");
         UserEntity owner=userService.getById(ownerId); UserEntity friend=userService.getById(friendId);
+        List<FriendGroupMappingEntity> existing = mappingRepo.findAllByOwnerIdAndFriendId(ownerId, friendId);
+        for (FriendGroupMappingEntity m : existing) {
+            if (!groupIds.contains(m.getGroup().getId())) {
+                mappingRepo.delete(m);
+            }
+        }
         for (Long gid : groupIds) {
-            if (!mappingRepo.existsByOwnerIdAndFriendIdAndGroupId(ownerId,friendId,gid)) {
+            if (existing.stream().noneMatch(m -> m.getGroup().getId().equals(gid))) {
                 UserGroupEntity g = groupRepo.findById(gid).orElseThrow(()->new ResourceNotFoundException("Group",gid));
                 if (!g.getOwner().getId().equals(ownerId)) throw new ForbiddenException("Group "+gid+" does not belong to you");
                 mappingRepo.save(FriendGroupMappingEntity.builder().owner(owner).friend(friend).group(g).build());

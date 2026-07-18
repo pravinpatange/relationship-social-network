@@ -27,7 +27,7 @@ public class ModeService {
     public UserModeEntity getCurrentMode(Long userId) {
         return modeRepo.findByUserId(userId).orElseGet(()->{
             UserEntity u = userService.getById(userId);
-            return UserModeEntity.builder().user(u).activeMode("ALL").build();
+            return UserModeEntity.builder().userId(userId).user(u).activeMode("ALL").updatedAt(java.time.LocalDateTime.now()).build();
         });
     }
     public ModeDto.ModeResponse toResponse(UserModeEntity m) {

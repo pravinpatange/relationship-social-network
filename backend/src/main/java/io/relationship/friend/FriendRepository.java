@@ -16,6 +16,9 @@ public interface FriendRepository extends JpaRepository<FriendshipEntity, Long> 
     @Query("SELECT f FROM FriendshipEntity f WHERE f.receiver.id=:uid AND f.status='PENDING'")
     List<FriendshipEntity> findPendingRequestsForUser(@Param("uid") Long uid);
 
+    @Query("SELECT f FROM FriendshipEntity f WHERE f.requester.id=:uid AND f.status='PENDING'")
+    List<FriendshipEntity> findSentRequestsForUser(@Param("uid") Long uid);
+
     @Query("SELECT CASE WHEN COUNT(f)>0 THEN TRUE ELSE FALSE END FROM FriendshipEntity f WHERE ((f.requester.id=:u1 AND f.receiver.id=:u2) OR (f.requester.id=:u2 AND f.receiver.id=:u1)) AND f.status='ACCEPTED'")
     boolean areFriends(@Param("u1") Long u1, @Param("u2") Long u2);
 

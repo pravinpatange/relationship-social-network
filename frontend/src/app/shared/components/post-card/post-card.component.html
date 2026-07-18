@@ -1,0 +1,77 @@
+<div class="post-card fade-in-up">
+  <!-- Header -->
+  <div class="post-header">
+    <div class="avatar" style="width:42px;height:42px;font-size:15px">{{initials(post.authorUsername)}}</div>
+    <div class="post-meta">
+      <span class="post-author" [routerLink]="['/profile', post.authorId]">{{post.authorUsername}}</span>
+      <div class="post-meta-row">
+        <span class="post-time">{{timeAgo(post.createdAt)}}</span>
+        <span class="visibility-badge" [ngClass]="[visibilityClass(post.visibilityType), 'badge']">
+          <span class="material-icons-round" style="font-size:10px">{{visibilityIcon(post.visibilityType)}}</span>
+          {{visibilityLabel(post.visibilityType)}}
+        </span>
+      </div>
+    </div>
+    <div class="post-menu-wrap" *ngIf="isOwner">
+      <button class="btn-icon" (click)="menuOpen.set(!menuOpen())">
+        <span class="material-icons-round">more_horiz</span>
+      </button>
+      <div class="post-menu glass-card" *ngIf="menuOpen()">
+        <div class="post-menu-item danger" (click)="deletePost()">
+          <span class="material-icons-round">delete_outline</span> Delete Post
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="post-content" *ngIf="post.caption">
+    <p>{{post.caption}}</p>
+  </div>
+
+  <div class="post-image" *ngIf="post.mediaUrl">
+    <img [src]="post.mediaUrl" [alt]="post.caption" loading="lazy" />
+  </div>
+
+  <!-- Actions -->
+  <div class="post-actions">
+    <button class="action-btn" [class.liked]="liked()" (click)="toggleLike()">
+      <span class="material-icons-round">{{liked() ? 'favorite' : 'favorite_border'}}</span>
+      <span>{{likeCount()}}</span>
+    </button>
+    <button class="action-btn" (click)="toggleComments()">
+      <span class="material-icons-round">chat_bubble_outline</span>
+      <span>{{comments().length || post.commentCount}}</span>
+    </button>
+    <button class="action-btn">
+      <span class="material-icons-round">share</span>
+    </button>
+  </div>
+
+  <!-- Comments -->
+  <div class="comments-section" *ngIf="showComments()">
+    <div class="comment-list">
+      <div class="comment-item fade-in-up" *ngFor="let c of comments()">
+        <div class="avatar" style="width:30px;height:30px;font-size:11px;flex-shrink:0">{{initials(c.authorUsername)}}</div>
+        <div class="comment-body">
+          <span class="comment-author">{{c.authorUsername}}</span>
+          <p class="comment-text">{{c.commentText}}</p>
+        </div>
+        <button class="btn-icon" *ngIf="c.authorId === auth.currentUser()?.id" (click)="deleteComment(c.id)" style="width:28px;height:28px">
+          <span class="material-icons-round" style="font-size:16px">close</span>
+        </button>
+      </div>
+      <div class="no-comments" *ngIf="comments().length === 0">No comments yet. Be first!</div>
+    </div>
+    <div class="comment-input-row">
+      <div class="avatar" style="width:32px;height:32px;font-size:12px;flex-shrink:0">
+        {{initials(auth.currentUser()?.displayName || '')}}
+      </div>
+      <input class="input-field comment-input" [(ngModel)]="newComment"
+             placeholder="Write a comment..." (keydown.enter)="submitComment()" />
+      <button class="btn-icon" [class.active]="newComment().trim()" (click)="submitComment()" [disabled]="loadingComment()">
+        <span class="material-icons-round">send</span>
+      </button>
+    </div>
+  </div>
+</div>

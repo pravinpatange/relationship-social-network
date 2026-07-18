@@ -1,0 +1,69 @@
+<div class="feed-layout">
+  <!-- Feed Column -->
+  <div class="feed-col">
+    <!-- Mode Filter Bar -->
+    <div class="mode-filter-bar glass-card">
+      <button class="mode-filter-btn" [class.active]="activeGroupId() === null" (click)="switchGroup(null)">
+        <span class="material-icons-round">all_inclusive</span> All
+      </button>
+      <button class="mode-filter-btn" *ngFor="let g of groups()"
+              [class.active]="activeGroupId() === g.id" (click)="switchGroup(g.id)">
+        <span class="material-icons-round">group</span> {{g.groupName}}
+      </button>
+    </div>
+
+    <!-- Create Post -->
+    <app-create-post (posted)="onNewPost($event)" />
+
+    <!-- Loading skeletons -->
+    <div *ngIf="loading()">
+      <div class="skeleton-card glass-card" *ngFor="let i of [1,2,3]">
+        <div class="skel-row">
+          <div class="shimmer" style="width:42px;height:42px;border-radius:50%"></div>
+          <div style="flex:1">
+            <div class="shimmer" style="height:14px;width:140px;border-radius:6px;margin-bottom:8px"></div>
+            <div class="shimmer" style="height:11px;width:90px;border-radius:6px"></div>
+          </div>
+        </div>
+        <div class="shimmer" style="height:80px;border-radius:10px;margin-top:14px"></div>
+        <div class="skel-row" style="margin-top:14px;gap:12px">
+          <div class="shimmer" style="height:32px;width:80px;border-radius:8px"></div>
+          <div class="shimmer" style="height:32px;width:80px;border-radius:8px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts -->
+    <div *ngIf="!loading()">
+      <div *ngIf="posts().length === 0" class="empty-feed glass-card">
+        <span class="material-icons-round" style="font-size:48px;color:var(--white-60)">feed</span>
+        <h3>Your feed is empty</h3>
+        <p>Add friends and start posting to fill your feed.</p>
+      </div>
+
+      <app-post-card *ngFor="let post of posts()" [post]="post" (deleted)="onPostDeleted($event)" />
+
+      <button class="load-more-btn btn-ghost" *ngIf="hasMore() && !loading()" (click)="loadMore()" [disabled]="loadingMore()">
+        <span class="spinner" *ngIf="loadingMore()"></span>
+        <span *ngIf="!loadingMore()">Load More</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="right-panel">
+    <div class="rp-section glass-card">
+      <h4 class="rp-title">
+        <span class="material-icons-round">hub</span> Your Groups
+      </h4>
+      <div *ngIf="groups().length === 0" class="rp-empty">No groups yet.</div>
+      <div *ngFor="let g of groups()" class="rp-group-item"
+           [class.active]="activeGroupId() === g.id" (click)="switchGroup(g.id)">
+        <div class="rp-group-icon">
+          <span class="material-icons-round">group</span>
+        </div>
+        <span>{{g.groupName}}</span>
+      </div>
+    </div>
+  </div>
+</div>

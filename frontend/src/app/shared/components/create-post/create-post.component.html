@@ -1,0 +1,71 @@
+<div class="create-post glass-card">
+  <!-- Collapsed row -->
+  <div class="create-row" *ngIf="!expanded()">
+    <div class="avatar" style="width:40px;height:40px;font-size:14px">{{initials(currentUser?.displayName)}}</div>
+    <div class="create-placeholder" (click)="expand()">
+      What's on your mind, {{(currentUser?.displayName || '').split(' ')[0]}}?
+    </div>
+    <button class="btn-icon" (click)="expand()" title="Add photo">
+      <span class="material-icons-round">image</span>
+    </button>
+  </div>
+
+  <!-- Expanded -->
+  <div class="create-expanded fade-in-up" *ngIf="expanded()">
+    <div class="create-header">
+      <div class="avatar" style="width:40px;height:40px;font-size:14px">{{initials(currentUser?.displayName)}}</div>
+      <div>
+        <div class="create-name">{{currentUser?.displayName}}</div>
+        <!-- Visibility selector -->
+        <div class="vis-select-wrap">
+          <button class="vis-btn" (click)="showGroups.set(!showGroups())">
+            <span class="material-icons-round" style="font-size:14px">{{selectedVisibility?.icon}}</span>
+            {{selectedVisibility?.label}}
+            <span class="material-icons-round" style="font-size:14px">expand_more</span>
+          </button>
+          <div class="vis-dropdown glass-card" *ngIf="showGroups()">
+            <div class="vis-option" *ngFor="let v of visibilityOptions" [class.active]="visibility() === v.value"
+              (click)="visibility.set($any(v.value)); showGroups.set(false)">
+              <span class="material-icons-round">{{v.icon}}</span>
+              <div>
+                <div class="vis-label">{{v.label}}</div>
+                <div class="vis-desc">{{v.desc}}</div>
+              </div>
+              <span class="material-icons-round" *ngIf="visibility()===v.value"
+                style="color:var(--violet-light);font-size:16px;margin-left:auto">check_circle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <textarea class="create-textarea" [(ngModel)]="caption" placeholder="What's on your mind?" rows="3"
+      (input)="caption.set($any($event.target).value)"></textarea>
+
+    <input class="input-field" style="margin-top:8px" [(ngModel)]="mediaUrl"
+      placeholder="🖼  Paste image URL (optional)" />
+
+    <!-- Group selector when SELECTED_GROUPS -->
+    <div class="group-selector" *ngIf="visibility() === 'SELECTED_GROUPS'">
+      <p class="group-selector-label">Choose groups who can see this:</p>
+      <div class="group-tags">
+        <span *ngFor="let g of groups()" class="group-tag" [class.active]="selectedGroupIds().includes(g.id)"
+          (click)="toggleGroup(g.id)">
+          <span class="material-icons-round" style="font-size:14px">group</span>
+          {{g.groupName}}
+        </span>
+        <span class="group-tag disabled" *ngIf="groups().length === 0">No groups yet — create some first</span>
+      </div>
+    </div>
+
+    <div class="create-footer">
+      <button class="btn-ghost" (click)="reset()">Cancel</button>
+      <button class="btn-primary" (click)="submit()"
+        [disabled]="loading() || (!caption().trim() && !mediaUrl().trim())">
+        <span class="spinner" *ngIf="loading()"></span>
+        <span class="material-icons-round" *ngIf="!loading()">send</span>
+        {{loading() ? 'Posting...' : 'Post'}}
+      </button>
+    </div>
+  </div>
+</div>

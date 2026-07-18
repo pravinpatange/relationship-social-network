@@ -1,0 +1,76 @@
+<div class="app-layout">
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" *ngIf="sidebarOpen()" (click)="sidebarOpen.set(false)"></div>
+
+  <!-- Sidebar -->
+  <aside class="main-sidebar" [class.open]="sidebarOpen()">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <span class="material-icons-round" style="color:var(--violet-light);font-size:26px">hub</span>
+      <span class="gradient-text" style="font-family:var(--font-display);font-size:20px;font-weight:700">Nexus</span>
+    </div>
+
+    <!-- Active Mode -->
+    <div class="mode-menu-wrap">
+      <div class="mode-pill" (click)="showModeMenu.set(!showModeMenu())">
+        <span class="material-icons-round" style="font-size:16px">
+          {{activeMode()?.activeGroupId ? 'group' : 'all_inclusive'}}
+        </span>
+        {{activeMode()?.activeGroupName || 'All Mode'}}
+        <span class="material-icons-round" style="font-size:14px;margin-left:auto">expand_more</span>
+      </div>
+      <div class="mode-dropdown glass-card" *ngIf="showModeMenu()">
+        <div class="mode-option" (click)="switchMode(null)" [class.active]="!activeMode()?.activeGroupId">
+          <span class="material-icons-round">all_inclusive</span> All Mode
+        </div>
+        <div class="mode-divider"></div>
+        <div class="mode-option" *ngFor="let g of groups()" (click)="switchMode(g.id)" [class.active]="activeMode()?.activeGroupId === g.id">
+          <span class="material-icons-round">group</span> {{g.groupName}}
+        </div>
+        <div class="mode-empty" *ngIf="groups().length === 0">No groups yet</div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+      <a *ngFor="let item of navItems" [routerLink]="item.path" routerLinkActive="active" class="nav-item">
+        <span class="material-icons-round">{{item.icon}}</span>
+        {{item.label}}
+        <span class="notif-badge" *ngIf="item.label === 'Notifications' && unreadCount() > 0">
+          {{unreadCount() > 9 ? '9+' : unreadCount()}}
+        </span>
+      </a>
+    </nav>
+
+    <!-- User card at bottom -->
+    <div class="sidebar-user" *ngIf="currentUser">
+      <div class="avatar" style="width:38px;height:38px;font-size:14px">
+        <img *ngIf="currentUser.profilePictureUrl" [src]="currentUser.profilePictureUrl" [alt]="currentUser.displayName" style="width:100%;height:100%;border-radius:50%;object-fit:cover" />
+        <span *ngIf="!currentUser.profilePictureUrl">{{initials(currentUser.displayName)}}</span>
+      </div>
+      <div class="sidebar-user-info">
+        <span class="sidebar-user-name">{{currentUser.displayName}}</span>
+        <span class="sidebar-user-handle">@{{currentUser.username}}</span>
+      </div>
+      <button class="btn-icon" (click)="auth.logout()" title="Logout" style="margin-left:auto">
+        <span class="material-icons-round" style="font-size:18px">logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Mobile topbar -->
+    <div class="mobile-topbar">
+      <button class="btn-icon" (click)="sidebarOpen.set(true)">
+        <span class="material-icons-round">menu</span>
+      </button>
+      <span class="gradient-text" style="font-family:var(--font-display);font-size:18px;font-weight:700">Nexus</span>
+      <div class="avatar" style="width:32px;height:32px;font-size:12px" *ngIf="currentUser">
+        {{initials(currentUser.displayName)}}
+      </div>
+    </div>
+
+    <router-outlet />
+  </main>
+</div>

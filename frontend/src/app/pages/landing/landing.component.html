@@ -1,0 +1,81 @@
+<div class="landing">
+  <!-- Particle Canvas -->
+  <canvas #canvas class="particle-canvas"></canvas>
+
+  <!-- Nav -->
+  <nav class="land-nav">
+    <div class="land-logo">
+      <span class="material-icons-round" style="color:var(--violet-light);font-size:28px">hub</span>
+      <span class="logo-text gradient-text">Nexus</span>
+    </div>
+    <div class="land-nav-links">
+      <a routerLink="/login" class="btn-ghost">Sign In</a>
+      <a routerLink="/register" class="btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge fade-in-up">
+      <span class="material-icons-round" style="font-size:14px;color:var(--teal)">auto_awesome</span>
+      Relationship-Aware Social Platform
+    </div>
+    <h1 class="hero-title fade-in-up">
+      Your world,<br>
+      <span class="gradient-text">filtered by who matters.</span>
+    </h1>
+    <p class="hero-sub fade-in-up">
+      One platform. Infinite relationship contexts.<br>
+      Family, work, travel — each connection in its own space.
+    </p>
+    <div class="hero-ctas fade-in-up">
+      <a routerLink="/register" class="btn-primary" style="font-size:16px;padding:14px 32px">
+        <span class="material-icons-round">rocket_launch</span> Join Nexus Free
+      </a>
+      <a routerLink="/login" class="btn-ghost" style="font-size:16px;padding:14px 32px">
+        <span class="material-icons-round">login</span> Sign In
+      </a>
+    </div>
+    <!-- Stats row -->
+    <div class="stats-row fade-in-up">
+      <div class="stat-pill" *ngFor="let s of stats">
+        <span class="stat-value gradient-text">{{s.value}}</span>
+        <span class="stat-label">{{s.label}}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features-section">
+    <div class="section-badge">Why Nexus?</div>
+    <h2 class="section-title">Built around <span class="gradient-text">real relationships</span></h2>
+    <div class="features-grid">
+      <div class="feature-card glass-card" *ngFor="let f of features; let i = index"
+           [style.animation-delay]="(i * 0.08) + 's'">
+        <div class="feature-icon">
+          <span class="material-icons-round">{{f.icon}}</span>
+        </div>
+        <h3>{{f.title}}</h3>
+        <p>{{f.desc}}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-card gradient-border glass-card">
+      <div class="cta-glow"></div>
+      <h2>Ready to connect with context?</h2>
+      <p>Join and experience social networking the way it was always meant to be.</p>
+      <a routerLink="/register" class="btn-primary" style="font-size:16px;padding:14px 40px">
+        <span class="material-icons-round">person_add</span> Create Free Account
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="land-footer">
+    <span class="gradient-text" style="font-family:var(--font-display);font-weight:700">Nexus</span>
+    <span style="color:var(--white-60);font-size:13px"> — Relationship-Aware Social Network &nbsp;·&nbsp; Built by Pravin Patange</span>
+  </footer>
+</div>

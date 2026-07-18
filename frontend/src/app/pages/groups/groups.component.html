@@ -1,0 +1,106 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Relationship Groups</h1>
+      <p class="page-sub">Organize your connections into meaningful circles</p>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <span class="material-icons-round">add</span> New Group
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="groups-grid" *ngIf="loading()">
+    <div class="skeleton-group glass-card" *ngFor="let i of [1,2,3,4]">
+      <div class="shimmer" style="width:56px;height:56px;border-radius:16px;margin-bottom:16px"></div>
+      <div class="shimmer" style="height:18px;width:120px;border-radius:6px;margin-bottom:8px"></div>
+      <div class="shimmer" style="height:13px;width:180px;border-radius:6px"></div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state glass-card" *ngIf="!loading() && groups().length === 0">
+    <div class="empty-icon">
+      <span class="material-icons-round">hub</span>
+    </div>
+    <h3>No groups yet</h3>
+    <p>Create your first relationship group to start organizing your connections.</p>
+    <button class="btn-primary" (click)="openCreate()">
+      <span class="material-icons-round">add</span> Create First Group
+    </button>
+  </div>
+
+  <!-- Groups Grid -->
+  <div class="groups-grid" *ngIf="!loading() && groups().length > 0">
+    <div class="group-card glass-card fade-in-up" *ngFor="let g of groups(); let i = index"
+         [style.animation-delay]="(i * 0.07) + 's'">
+      <div class="group-card-icon" [class]="'color-' + colorClass(i)">
+        <span class="material-icons-round">{{icon(i)}}</span>
+      </div>
+      <h3 class="group-card-name">{{g.groupName}}</h3>
+      <p class="group-card-desc">{{g.description || 'No description'}}</p>
+      <div class="group-card-footer">
+        <span class="group-card-date">
+          <span class="material-icons-round" style="font-size:13px">calendar_today</span>
+          {{g.createdAt | date:'MMM d, y'}}
+        </span>
+        <div class="group-card-actions">
+          <button class="btn-icon" (click)="openEdit(g)" title="Edit">
+            <span class="material-icons-round" style="font-size:18px">edit</span>
+          </button>
+          <button class="btn-icon" (click)="confirmDelete(g.id)" title="Delete" style="color:var(--coral-light)">
+            <span class="material-icons-round" style="font-size:18px">delete_outline</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create / Edit Modal -->
+<div class="modal-backdrop" *ngIf="showCreate()" (click)="closeModal()"></div>
+<div class="modal glass-card fade-in-up" *ngIf="showCreate()">
+  <div class="modal-header">
+    <h3>{{editingGroup() ? 'Edit Group' : 'Create New Group'}}</h3>
+    <button class="btn-icon" (click)="closeModal()"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="modal-body">
+    <div class="field-group">
+      <label>Group Name *</label>
+      <input class="input-field" [(ngModel)]="newName" placeholder="e.g. Family, Corporate, Travel..." />
+    </div>
+    <div class="field-group" style="margin-top:16px">
+      <label>Description <span style="color:var(--white-60);font-weight:400">(optional)</span></label>
+      <textarea class="input-field" [(ngModel)]="newDesc" placeholder="What's this group about?" rows="3" style="resize:none"></textarea>
+    </div>
+    <div class="modal-error" *ngIf="error()">
+      <span class="material-icons-round">error_outline</span> {{error()}}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-ghost" (click)="closeModal()">Cancel</button>
+    <button class="btn-primary" (click)="save()" [disabled]="saving()">
+      <span class="spinner" *ngIf="saving()"></span>
+      <span class="material-icons-round" *ngIf="!saving()">{{editingGroup() ? 'save' : 'add'}}</span>
+      {{saving() ? 'Saving...' : (editingGroup() ? 'Save Changes' : 'Create Group')}}
+    </button>
+  </div>
+</div>
+
+<!-- Confirm Delete Dialog -->
+<div class="modal-backdrop" *ngIf="confirmDeleteId()" (click)="confirmDeleteId.set(null)"></div>
+<div class="modal glass-card fade-in-up" *ngIf="confirmDeleteId()" style="max-width:380px">
+  <div class="modal-header">
+    <h3 style="color:var(--coral-light)"><span class="material-icons-round">warning</span> Delete Group?</h3>
+  </div>
+  <div class="modal-body">
+    <p style="color:var(--white-60)">This will remove the group and all friend assignments. This cannot be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-ghost" (click)="confirmDeleteId.set(null)">Cancel</button>
+    <button class="btn-primary" style="background:linear-gradient(135deg,var(--coral),#ff1744)" (click)="deleteGroup(confirmDeleteId()!)">
+      <span class="material-icons-round">delete_forever</span> Delete
+    </button>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="auth-brand">
+      <span class="material-icons-round" style="font-size:40px;color:var(--violet-light)">hub</span>
+      <h1 class="gradient-text">Nexus</h1>
+      <p>Relationship-aware social networking.<br>Connect with context.</p>
+    </div>
+    <div class="auth-rings">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-card glass-card fade-in-up">
+      <h2>Welcome back</h2>
+      <p class="auth-sub">Sign in to your Nexus account</p>
+
+      <div class="auth-error" *ngIf="error()">
+        <span class="material-icons-round">error_outline</span> {{error()}}
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="field-group">
+          <label>Email address</label>
+          <div class="input-wrap">
+            <span class="material-icons-round">email</span>
+            <input class="input-field" type="email" formControlName="email" placeholder="pravin@example.com" />
+          </div>
+          <span class="field-err" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">Valid email required</span>
+        </div>
+
+        <div class="field-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="material-icons-round">lock</span>
+            <input class="input-field" [type]="showPass() ? 'text' : 'password'" formControlName="password" placeholder="••••••••" />
+            <span class="material-icons-round eye-toggle" (click)="showPass.set(!showPass())">
+              {{showPass() ? 'visibility_off' : 'visibility'}}
+            </span>
+          </div>
+          <span class="field-err" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">Min 8 characters</span>
+        </div>
+
+        <button type="submit" class="btn-primary auth-btn" [disabled]="loading()">
+          <span class="material-icons-round" *ngIf="!loading()">login</span>
+          <span class="spinner" *ngIf="loading()"></span>
+          {{loading() ? 'Signing in...' : 'Sign In'}}
+        </button>
+      </form>
+
+      <div class="auth-divider"><span>New to Nexus?</span></div>
+      <a routerLink="/register" class="btn-ghost" style="width:100%;justify-content:center">
+        <span class="material-icons-round">person_add</span> Create Account
+      </a>
+    </div>
+  </div>
+</div>

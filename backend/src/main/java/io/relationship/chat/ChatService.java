@@ -3,6 +3,7 @@ import io.relationship.common.exception.*;
 import io.relationship.group.*;
 import io.relationship.user.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -12,6 +13,7 @@ public class ChatService {
     private final ChatMessageRepository msgRepo;
     private final UserService userService;
     private final GroupRepository groupRepo;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public ChatRoomEntity getOrCreateRoom(Long uid, Long otherId, Long groupId) {
@@ -25,7 +27,13 @@ public class ChatService {
         ChatRoomEntity room = roomRepo.findById(roomId).orElseThrow(()->new ResourceNotFoundException("Chat room",roomId));
         if (!room.getUser1().getId().equals(uid) && !room.getUser2().getId().equals(uid))
             throw new ForbiddenException("You are not a participant of this chat room");
-        return msgRepo.save(ChatMessageEntity.builder().room(room).sender(userService.getById(uid)).message(text).build());
+        
+        ChatMessageEntity savedMsg = msgRepo.save(ChatMessageEntity.builder().room(room).sender(userService.getById(uid)).message(text).build());
+        
+        Long receiverId = room.getUser1().getId().equals(uid) ? room.getUser2().getId() : room.getUser1().getId();
+        messagingTemplate.convertAndSendToUser(receiverId.toString(), "/queue/messages", toMsgResponse(savedMsg));
+        
+        return savedMsg;
     }
     @Transactional(readOnly=true)
     public List<ChatMessageEntity> getMessages(Long uid, Long roomId) {

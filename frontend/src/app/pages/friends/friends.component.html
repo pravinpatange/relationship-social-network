@@ -1,0 +1,153 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Friends</h1>
+      <p class="page-sub">Manage your connections and relationship groups</p>
+    </div>
+    <div class="pending-badge-wrap" *ngIf="pending().length > 0">
+      <span class="notif-badge" style="font-size:13px;padding:4px 12px">{{pending().length}} pending</span>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar glass-card">
+    <button class="tab-btn" [class.active]="tab()==='friends'" (click)="tab.set('friends')">
+      <span class="material-icons-round">people</span> Friends
+      <span class="tab-count">{{friends().length}}</span>
+    </button>
+    <button class="tab-btn" [class.active]="tab()==='requests'" (click)="tab.set('requests')">
+      <span class="material-icons-round">person_add</span> Requests
+      <span class="tab-count coral" *ngIf="pending().length > 0">{{pending().length}}</span>
+    </button>
+    <button class="tab-btn" [class.active]="tab()==='search'" (click)="tab.set('search')">
+      <span class="material-icons-round">search</span> Find People
+    </button>
+  </div>
+
+  <!-- FRIENDS TAB -->
+  <div *ngIf="tab()==='friends'">
+    <div class="friends-grid" *ngIf="!loading()">
+      <div class="friend-card glass-card fade-in-up" *ngFor="let f of friends(); let i = index" [style.animation-delay]="(i*0.05)+'s'">
+        <div class="friend-card-top">
+          <div class="avatar" style="width:52px;height:52px;font-size:18px">{{initials(friendName(f))}}</div>
+          <div>
+            <div class="friend-name" [routerLink]="['/profile', friendId(f)]">{{friendName(f)}}</div>
+            <div class="friend-meta">
+              <span class="material-icons-round" style="font-size:13px;color:var(--teal)">check_circle</span> Connected
+            </div>
+          </div>
+        </div>
+        <div class="friend-actions">
+          <button class="btn-ghost" style="flex:1;justify-content:center;font-size:13px;padding:8px" (click)="messageFriend(f)">
+            <span class="material-icons-round" style="font-size:16px">chat</span> Message
+          </button>
+          <button class="btn-ghost" style="flex:1;justify-content:center;font-size:13px;padding:8px" (click)="openAssign(f)">
+            <span class="material-icons-round" style="font-size:16px">hub</span> Groups
+          </button>
+          <button class="btn-icon" (click)="unfriend(friendId(f))" title="Unfriend" style="color:var(--coral-light)">
+            <span class="material-icons-round" style="font-size:18px">person_remove</span>
+          </button>
+        </div>
+      </div>
+      <div class="empty-state glass-card" *ngIf="friends().length === 0">
+        <span class="material-icons-round" style="font-size:48px;color:var(--white-60)">people_outline</span>
+        <h3>No friends yet</h3>
+        <p>Search for people to connect with.</p>
+        <button class="btn-primary" (click)="tab.set('search')">
+          <span class="material-icons-round">search</span> Find People
+        </button>
+      </div>
+    </div>
+    <div class="friends-grid" *ngIf="loading()">
+      <div class="friend-card glass-card" *ngFor="let i of [1,2,3,4]">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="shimmer" style="width:52px;height:52px;border-radius:50%"></div>
+          <div style="flex:1"><div class="shimmer" style="height:14px;width:120px;border-radius:6px;margin-bottom:8px"></div><div class="shimmer" style="height:12px;width:80px;border-radius:6px"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REQUESTS TAB -->
+  <div *ngIf="tab()==='requests'">
+    <div class="empty-state glass-card" *ngIf="pending().length === 0">
+      <span class="material-icons-round" style="font-size:48px;color:var(--white-60)">mark_email_read</span>
+      <h3>No pending requests</h3>
+      <p>You're all caught up!</p>
+    </div>
+    <div class="requests-list" *ngIf="pending().length > 0">
+      <div class="request-card glass-card fade-in-up" *ngFor="let r of pending(); let i = index" [style.animation-delay]="(i*0.06)+'s'">
+        <div class="avatar" style="width:48px;height:48px;font-size:17px">{{initials(r.requesterUsername)}}</div>
+        <div class="request-info">
+          <span class="friend-name">{{r.requesterUsername}}</span>
+          <span class="friend-meta">wants to connect with you</span>
+        </div>
+        <div class="request-btns">
+          <button class="btn-primary" style="padding:8px 16px;font-size:13px" (click)="accept(r.id)">
+            <span class="material-icons-round" style="font-size:16px">check</span> Accept
+          </button>
+          <button class="btn-ghost" style="padding:8px 16px;font-size:13px" (click)="reject(r.id)">Decline</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH TAB -->
+  <div *ngIf="tab()==='search'">
+    <div class="search-bar glass-card">
+      <span class="material-icons-round search-icon">search</span>
+      <input class="search-input" [(ngModel)]="searchQuery" placeholder="Search by name or username..." (keydown.enter)="search()" />
+      <button class="btn-primary" style="padding:8px 20px;font-size:14px" (click)="search()" [disabled]="searching()">
+        <span class="spinner" *ngIf="searching()"></span>
+        <span *ngIf="!searching()">Search</span>
+      </button>
+    </div>
+    <div class="search-results">
+      <h3 class="section-heading" style="padding:16px 16px 0;margin:0" *ngIf="searchQuery().length < 2 && suggestions().length > 0">Suggested for you</h3>
+      <div class="friend-card glass-card fade-in-up" *ngFor="let u of (searchQuery().length < 2 ? suggestions() : searchResults()); let i = index" [style.animation-delay]="(i*0.05)+'s'">
+        <div class="friend-card-top">
+          <div class="avatar" style="width:48px;height:48px;font-size:17px">{{initials(u.displayName)}}</div>
+          <div>
+            <div class="friend-name">{{u.displayName}}</div>
+            <div class="friend-meta">@{{u.username}}</div>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%;justify-content:center;font-size:13px;padding:8px" (click)="sendRequest(u.id)" [disabled]="u._requested || u._isFriend || u._pending">
+          <span class="material-icons-round" style="font-size:16px">
+            {{ u._isFriend ? 'people' : (u._requested ? 'how_to_reg' : (u._pending ? 'mark_email_unread' : 'person_add')) }}
+          </span> 
+          {{ u._isFriend ? 'Friends' : (u._requested ? 'Sent' : (u._pending ? 'Has pending request' : 'Connect')) }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Groups Modal -->
+<div class="modal-backdrop" *ngIf="assignTarget()" (click)="assignTarget.set(null)"></div>
+<div class="modal glass-card fade-in-up" *ngIf="assignTarget()">
+  <div class="modal-header">
+    <h3><span class="material-icons-round" style="color:var(--violet-light)">hub</span> Assign to Groups</h3>
+    <button class="btn-icon" (click)="assignTarget.set(null)"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="modal-body">
+    <p style="color:var(--white-60);font-size:13px;margin-bottom:16px">Choose which groups <strong style="color:var(--white)">{{assignTarget()?.requesterUsername}}</strong> belongs to:</p>
+    <div class="assign-groups">
+      <div class="assign-group-item" *ngFor="let g of groups()" [class.selected]="assignedGroups().includes(g.id)" (click)="toggleAssignGroup(g.id)">
+        <span class="material-icons-round">{{assignedGroups().includes(g.id) ? 'check_box' : 'check_box_outline_blank'}}</span>
+        <span>{{g.groupName}}</span>
+      </div>
+      <div style="color:var(--white-60);font-size:13px;text-align:center;padding:16px" *ngIf="groups().length === 0">
+        Create some groups first to assign friends.
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-ghost" (click)="assignTarget.set(null)">Cancel</button>
+    <button class="btn-primary" (click)="saveGroups()" [disabled]="savingGroups()">
+      <span class="spinner" *ngIf="savingGroups()"></span>
+      <span class="material-icons-round" *ngIf="!savingGroups()">save</span>
+      {{savingGroups() ? 'Saving...' : 'Save Groups'}}
+    </button>
+  </div>
+</div>

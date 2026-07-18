@@ -1,0 +1,54 @@
+.profile-page { max-width:760px; margin:0 auto; padding:0 0 80px; }
+.profile-loading { padding:32px 24px; }
+
+.profile-cover { height:180px; position:relative; border-radius:0 0 0 0; overflow:hidden; }
+.cover-gradient { position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,0.4),rgba(255,77,109,0.3),rgba(0,212,170,0.2)); }
+.cover-overlay { position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(10,14,26,0) 0%,rgba(10,14,26,0.6) 100%); }
+
+.profile-body { padding:0 24px; }
+.profile-top-row { display:flex;align-items:flex-end;justify-content:space-between;margin-top:-48px;margin-bottom:16px;flex-wrap:wrap;gap:12px; }
+.profile-avatar { border-radius:50%;width:100px;height:100px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0; }
+.profile-actions { display:flex;gap:10px;padding-bottom:4px;flex-wrap:wrap; }
+
+.profile-info { margin-bottom:24px; }
+.profile-name { font-size:26px;font-weight:700;color:var(--white);margin-bottom:4px; }
+.profile-handle { font-size:15px;color:var(--white-60);margin-bottom:12px; }
+.profile-bio { font-size:14px;color:var(--white);line-height:1.7;margin-bottom:14px; }
+.profile-meta-row { display:flex;flex-wrap:wrap;gap:16px; }
+.profile-meta-item { display:flex;align-items:center;gap:6px;font-size:13px;color:var(--white-60); }
+.profile-meta-item .material-icons-round { font-size:16px;color:var(--violet-light); }
+.profile-meta-item a { color:var(--violet-light); }
+.profile-meta-item a:hover { color:var(--white); }
+
+.profile-tabs { display:flex;gap:4px;margin-bottom:20px;background:var(--white-10);border:1px solid var(--glass-border);border-radius:12px;padding:4px; }
+.profile-tab { display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:9px;background:transparent;border:none;color:var(--white-60);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;flex:1;justify-content:center; }
+.profile-tab:hover { color:var(--white); }
+.profile-tab.active { background:var(--violet-glow);color:var(--violet-light); }
+.profile-tab .material-icons-round { font-size:18px; }
+.tab-count { background:var(--white-20);border-radius:10px;padding:1px 8px;font-size:11px; }
+
+.post-skeleton { padding:20px;margin-bottom:16px; }
+.private-posts { display:flex;flex-direction:column;align-items:center;gap:12px;padding:60px 24px;text-align:center;color:var(--white-60);font-size:14px; }
+.empty-posts { display:flex;flex-direction:column;align-items:center;gap:12px;padding:60px 24px;text-align:center;color:var(--white-60);font-size:14px; }
+
+.about-section { padding:24px;display:flex;flex-direction:column;gap:0; }
+.about-row { display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--glass-border); }
+.about-row:last-child { border-bottom:none; }
+.about-row .material-icons-round { font-size:20px;color:var(--violet-light);margin-top:2px;flex-shrink:0; }
+.about-label { font-size:11px;font-weight:600;color:var(--white-60);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px; }
+.about-value { font-size:14px;color:var(--white); }
+
+.vis-toggle-row { display:flex;gap:10px; }
+.vis-toggle-btn { display:flex;align-items:center;gap:6px;flex:1;justify-content:center;padding:10px;border-radius:10px;border:1px solid var(--glass-border);background:var(--white-10);color:var(--white-60);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s; }
+.vis-toggle-btn:hover { background:var(--white-20);color:var(--white); }
+.vis-toggle-btn.active { background:var(--violet-glow);border-color:var(--violet);color:var(--violet-light); }
+
+.modal-backdrop { position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:400; }
+.modal { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:500;width:100%;max-width:500px;padding:0;overflow:hidden;max-height:90vh;overflow-y:auto; }
+.modal-header { display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0; }
+.modal-header h3 { display:flex;align-items:center;gap:8px;font-size:18px;color:var(--white); }
+.modal-body { padding:20px 24px; }
+.modal-footer { display:flex;gap:12px;justify-content:flex-end;padding:16px 24px;border-top:1px solid var(--glass-border); }
+.field-group label { display:block;font-size:12px;font-weight:600;color:var(--white-60);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px; }
+.spinner { width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block; }
+@keyframes spin { to { transform:rotate(360deg); } }

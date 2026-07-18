@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,13 @@ public class UserService {
         Page<UserDto.UserResponse> mapped = result.map(this::toResponse);
         return PagedResponse.of(mapped);
     }
+
+    @Transactional(readOnly = true)
+    public List<UserDto.UserResponse> getSuggestions(Long requesterId) {
+        Pageable pageable = PageRequest.of(0, 10);
+        return userRepository.findSuggestions(requesterId, pageable).map(this::toResponse).getContent();
+    }
+
     public UserDto.UserResponse toResponse(UserEntity user) {
         return UserDto.UserResponse.builder()
                 .id(user.getId())
